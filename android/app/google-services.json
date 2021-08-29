@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "962795705465",
+    "project_id": "cybertechms-694e8",
+    "storage_bucket": "cybertechms-694e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962795705465:android:a1bc14b9bc834b4491f0a8",
+        "android_client_info": {
+          "package_name": "com.cybertech.cybertech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962795705465-3a63l7li5p3fo5gv5tp3opbg6nroeeju.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cybertech.cybertech",
+            "certificate_hash": "8d106acdc2eeb24ad7e23544f0ab3b7f8a3a9dc6"
+          }
+        },
+        {
+          "client_id": "962795705465-nl5fl22vehr1posgemkeodgphcko5dki.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy7ThMYL14wpdpSk_xleHd3kt0YG7uGfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962795705465-nl5fl22vehr1posgemkeodgphcko5dki.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
