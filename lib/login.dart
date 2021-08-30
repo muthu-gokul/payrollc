@@ -50,16 +50,20 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   static const String useremail = 'email';
   static const String passwordd = 'password';
 
+  AuthenticationHelper authenticationHelper=new AuthenticationHelper();
+
   void _loadCredentials() {
 
     setState(() {
-      AuthenticationHelper().prefEmail = this._Loginprefs.getString(useremail) ?? "";
-      AuthenticationHelper().prefPassword = this._Loginprefs.getString(passwordd) ?? "";
+     // AuthenticationHelper().pref_Email;
+      prefEmail = this._Loginprefs.getString(useremail) ?? "";
+      prefPassword= this._Loginprefs.getString(passwordd) ?? "";
     });
-    if(AuthenticationHelper().prefEmail.isNotEmpty&&AuthenticationHelper().prefPassword.isNotEmpty){
+
+    if(prefEmail.isNotEmpty && prefPassword.isNotEmpty){
       setState(() {
-        username.text=AuthenticationHelper().prefEmail;
-        password.text=AuthenticationHelper().prefPassword;
+        username.text=prefEmail;
+        password.text=prefPassword;
       });
     }
   }
@@ -86,7 +90,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     SharedPreferences.getInstance()
       ..then((prefs) {
         setState(() => this._Loginprefs = prefs);
-
         _loadCredentials();
       });
     offsetAnimation = Tween(begin: 0.0, end: 28.0)

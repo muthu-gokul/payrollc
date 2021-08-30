@@ -1,13 +1,26 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
+import 'package:cybertech/widgets/arrowBack.dart';
 import 'package:cybertech/widgets/closeButton.dart';
 import 'package:cybertech/widgets/customTextField.dart';
 import 'package:cybertech/widgets/loader.dart';
+import 'package:cybertech/widgets/sidePopUpParent.dart';
+import 'package:cybertech/widgets/sidePopupWithoutModelList.dart';
 import 'package:cybertech/widgets/validationErrorText.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+
 class EmployeeMasterAddNew extends StatefulWidget {
   const EmployeeMasterAddNew({Key? key}) : super(key: key);
 
@@ -30,9 +43,79 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
   bool password=false;
   bool email=false;
   bool emailValid=true;
+  bool userGroup=false;
+
+
   bool isLoad=false;
+  bool userGroupOpen=false;
+
+  int? userGroupId=null;
+  String? userGroupName=null;
 
   final databaseReference = FirebaseDatabase.instance.reference();
+  List<dynamic> userGroupList=[
+    {"UserGroupId": 1, "UserGroupName": "Admin"},
+    {"UserGroupId": 2, "UserGroupName": "GeneralUser"},
+    {"UserGroupId": 3, "UserGroupName": "Sales Executive"}
+    ];
+
+  File? _imageFile;
+  final picker = ImagePicker();
+  String? downloadUrl=null;
+  Future pickImage() async {
+    final tempImage = (await ImagePicker.platform.pickImage(source: ImageSource.gallery));
+    if (tempImage != null) {
+      _cropImage(tempImage);
+    }
+  }
+
+  _cropImage(PickedFile picked) async {
+    File? cropped = await ImageCropper.cropImage(
+      androidUiSettings: AndroidUiSettings(
+          statusBarColor: Colors.red,
+          toolbarColor: Colors.red,
+          toolbarTitle: "Crop Image",
+          toolbarWidgetColor: Colors.white,
+          showCropGrid: false,
+          hideBottomControls: true
+      ),
+      sourcePath: picked.path,
+      aspectRatioPresets: [
+
+        CropAspectRatioPreset.square
+      ],
+      maxWidth: 800,
+      cropStyle: CropStyle.rectangle,
+
+    );
+    if (cropped != null) {
+      setState(() {
+        _imageFile = cropped;
+        // imagestring=Utility.base64String(sampleImage.readAsBytesSync());
+      });
+    }
+
+  }
+
+
+  Future uploadImageToFirebase(BuildContext context,String fileName) async {
+    // String fileName = basename(_imageFile.path);
+
+
+
+      await firebase_storage.FirebaseStorage.instance.ref().child('propic/$fileName')
+      .putFile(_imageFile!);
+
+      downloadUrl = await firebase_storage.FirebaseStorage.instance
+          .ref('propic/$fileName')
+          .getDownloadURL();
+
+    // StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
+    // StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+    // taskSnapshot.ref.getDownloadURL().then(
+    //       (value) => print("Done: $value"),
+    // );
+  }
 
 
   @override
@@ -76,7 +159,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
     });
     super.initState();
   }
-
+  AuthenticationHelper authenticationHelper=new AuthenticationHelper();
   @override
   Widget build(BuildContext context) {
     final node = FocusScope.of(context);
@@ -92,7 +175,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                     SliverAppBar(
                       elevation: 0,
                       toolbarHeight: 50,
-                      backgroundColor: Color(0XFF353535),
+                      backgroundColor: bgColor,
                       leading: Container(),
                       actions: [
                         Container(
@@ -100,19 +183,22 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                           width:SizeConfig.screenWidth,
                           child: Row(
                             children: [
-                              CancelButton(
-                                ontap: (){
-                                  Navigator.pop(context);
-                                },
-                              ),
-                             Text("Employee Master Add New",
-                             style: TextStyle(fontFamily: 'RR',fontSize: 16),
-                             ),
-                             /* ArrowBack(
+                             /* CancelButton(
                                 ontap: (){
                                   Navigator.pop(context);
                                 },
                               ),*/
+                              ArrowBack(
+
+                                ontap: (){
+                                  Navigator.pop(context);
+                                },
+                                iconColor: Colors.white,
+                              ),
+                             Text("Employee Master Add New",
+                             style: TextStyle(fontFamily: 'RR',fontSize: 16),
+                             ),
+
 
                               SizedBox(width: 20,)
                             ],
@@ -124,7 +210,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                       pinned: true,
                       flexibleSpace: FlexibleSpaceBar(
                           background: Container(
-                            color: Color(0XFF353535),
+                            color:bgColor,
                             width: SizeConfig.screenWidth,
                             margin:EdgeInsets.only(top: 55),
 
@@ -183,7 +269,51 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                         },
                       ),
                       !password?Container():ValidationErrorText(),
-                      Text("${AuthenticationHelper().prefEmail} "),
+
+
+                      GestureDetector(
+                        onTap: (){
+                          node.unfocus();
+                          setState(() {
+                            userGroupOpen=true;
+                          });
+                         /* if(mun.isEdit){
+                            setState(() {
+                              userGroupOpen=true;
+                              _keyboardVisible=false;
+                            });
+                          }*/
+
+                        },
+                        child: SidePopUpParent(
+                          text:userGroupName==null? "Select User Group":userGroupName,
+                          textColor:userGroupName==null? grey.withOpacity(0.5):grey,
+                          iconColor:userGroupName==null? grey:yellowColor,
+                          //bgColor:userGroupName==null? disableColor:mun.isEdit?Colors.white:disableColor,
+                          bgColor:userGroupName==null? disableColor:Colors.white,
+
+                        ),
+                      ),
+                      !userGroup?Container():ValidationErrorText(),
+
+                      GestureDetector(
+                        onTap: (){
+                          pickImage();
+                        },
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: uploadColor,width: 2)
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: _imageFile!=null? Image.file(_imageFile!,fit: BoxFit.contain,):
+                          Center(child: SvgPicture.asset("assets/svg/upload.svg",height: 30,width: 30,)),
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+
                       GestureDetector(
                         onTap: (){
                           if(emailController.text.isNotEmpty){
@@ -202,7 +332,11 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                           if(passwordController.text.isEmpty){setState(() {password=true;});}
                           else{setState(() {password=false;});}
 
-                          if(emailValid && !email && !name && !password){
+                          if(userGroupId==null){setState(() {userGroup=true;});}
+                          else{setState(() {userGroup=false;});}
+
+                          if(emailValid && !email && !name && !password && !userGroup){
+
                             setState(() {
                               isLoad=true;
                             });
@@ -213,16 +347,32 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                                 .then((result) async {
                               if (result == null) {
 
+                                if(_imageFile!=null){
+                                  await firebase_storage.FirebaseStorage.instance.ref().child('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
+                                      .putFile(_imageFile!);
+
+                                  downloadUrl = await firebase_storage.FirebaseStorage.instance
+                                      .ref('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
+                                      .getDownloadURL();
+                                }
+                                else{
+                                  downloadUrl=null;
+                                }
+
+
                                 databaseReference.child("Users").child("${AuthenticationHelper().auth2.currentUser!.uid}").set({
                                   'Name': nameTextController.text,
                                  // 'PhoneNumber': phNo,
                                   'Email':emailController.text,
                                   'Password':passwordController.text,
+                                  'UserGroupId':userGroupId,
+                                  'UserGroupName':userGroupName,
+                                  'imgUrl':downloadUrl
 
                                 });
                                await AuthenticationHelper().auth2.signOut();
-                                AuthenticationHelper().signIn(email1: AuthenticationHelper().prefEmail,
-                                    password1: AuthenticationHelper().prefPassword);
+                                AuthenticationHelper().signIn(email1: prefEmail,
+                                    password1: prefPassword);
                                 setState(() {
                                   isLoad=false;
                                 });
@@ -257,10 +407,47 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
 
               Loader(
                 isLoad: isLoad,
-              )
+              ),
+
+
+              Container(
+
+                height: userGroupOpen ? SizeConfig.screenHeight:0,
+                width: userGroupOpen ? SizeConfig.screenWidth:0,
+                color: Colors.black.withOpacity(0.5),
+
+              ),
+
+              PopUpStatic2(
+                title: "Select User Group",
+                isOpen: userGroupOpen,
+                dataList: userGroupList,
+                propertyKeyName:"UserGroupName",
+                propertyKeyId: "UserGroupId",
+                selectedId: userGroupId,
+                itemOnTap: (index){
+                  setState(() {
+                    userGroupId=userGroupList[index]['UserGroupId'];
+                    userGroupName=userGroupList[index]['UserGroupName'];
+                    userGroupOpen=false;
+                  });
+                },
+                closeOnTap: (){
+                  setState(() {
+                    userGroupOpen=false;
+                  });
+                },
+              ),
             ],
           ),
       ),
     );
   }
+}
+
+
+class UserGroupModel{
+  int userGroupId;
+  String userGroup;
+  UserGroupModel({required this.userGroup,required this.userGroupId});
 }

@@ -4,18 +4,8 @@ class AuthenticationHelper {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseAuth auth2 = FirebaseAuth.instance;
   get user => _auth.currentUser;
-  late String prefEmail;
-  late String prefPassword;
 
-  String get pref_Email {
-    return prefEmail;
-  }
 
-  // Using the setter method
-  // to set the input
-  set pref_Email (String email) {
-    this.prefEmail = email;
-  }
 
 
   //SIGN UP METHOD

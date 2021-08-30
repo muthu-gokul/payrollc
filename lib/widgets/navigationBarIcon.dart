@@ -15,7 +15,7 @@ class NavBarIcon extends StatelessWidget {
         color: Colors.transparent,*/
         height: 40,
         width: 40,
-        margin: EdgeInsets.only(left: 20,top: 20),
+        margin: EdgeInsets.only(left: 20),
         padding: EdgeInsets.only(left: 7,top: 7),
         decoration: BoxDecoration(
             shape: BoxShape.circle,
