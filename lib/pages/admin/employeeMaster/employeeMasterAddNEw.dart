@@ -13,6 +13,7 @@ import 'package:cybertech/widgets/loader.dart';
 import 'package:cybertech/widgets/sidePopUpParent.dart';
 import 'package:cybertech/widgets/sidePopupWithoutModelList.dart';
 import 'package:cybertech/widgets/validationErrorText.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,7 +23,9 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 
 class EmployeeMasterAddNew extends StatefulWidget {
-  const EmployeeMasterAddNew({Key? key}) : super(key: key);
+  bool isEdit;
+  dynamic value;
+  EmployeeMasterAddNew({required this.isEdit,required this.value});
 
   @override
   _EmployeeMasterAddNewState createState() => _EmployeeMasterAddNewState();
@@ -38,6 +41,8 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
   TextEditingController vehNoController = new TextEditingController();
+  String editUid="";
+  String? editUrl=null;
 
   bool name=false;
   bool password=false;
@@ -156,6 +161,21 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
           });
         }*/
       });
+
+
+      if(widget.isEdit){
+        print(widget.value);
+        setState(() {
+          nameTextController.text=widget.value['Name'];
+          emailController.text=widget.value['Email'];
+          passwordController.text=widget.value['Password'];
+          userGroupId=widget.value['UserGroupId'];
+          userGroupName=widget.value['UserGroupName'];
+          editUrl=widget.value['imgUrl'];
+          editUid=widget.value['Uid'];
+        });
+      }
+
     });
     super.initState();
   }
@@ -195,7 +215,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                                 },
                                 iconColor: Colors.white,
                               ),
-                             Text("Employee Master Add New",
+                             Text(widget.isEdit?"":"Employee Master / Add New",
                              style: TextStyle(fontFamily: 'RR',fontSize: 16),
                              ),
 
@@ -308,7 +328,10 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                               border: Border.all(color: uploadColor,width: 2)
                           ),
                           clipBehavior: Clip.antiAlias,
-                          child: _imageFile!=null? Image.file(_imageFile!,fit: BoxFit.contain,):
+                          child:widget.isEdit && editUrl!=null?Image.network(editUrl!):
+                          _imageFile!=null? Image.file(_imageFile!,fit: BoxFit.contain,
+
+                          ):
                           Center(child: SvgPicture.asset("assets/svg/upload.svg",height: 30,width: 30,)),
                         ),
                       ),
@@ -342,49 +365,57 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                             });
                            // AuthenticationHelper().signOut();
                          //   print(AuthenticationHelper().auth2.currentUser!.uid);
-                            AuthenticationHelper()
-                                .signUp(email: emailController.text, password: passwordController.text)
-                                .then((result) async {
-                              if (result == null) {
+                            if(widget.isEdit){
+                              
+                            }
+                            else{
+                              AuthenticationHelper()
+                                  .signUp(email: emailController.text, password: passwordController.text)
+                                  .then((result) async {
+                                if (result == null) {
 
-                                if(_imageFile!=null){
-                                  await firebase_storage.FirebaseStorage.instance.ref().child('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
-                                      .putFile(_imageFile!);
+                                  if(_imageFile!=null){
+                                    await firebase_storage.FirebaseStorage.instance.ref().child('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
+                                        .putFile(_imageFile!);
 
-                                  downloadUrl = await firebase_storage.FirebaseStorage.instance
-                                      .ref('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
-                                      .getDownloadURL();
+                                    downloadUrl = await firebase_storage.FirebaseStorage.instance
+                                        .ref('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
+                                        .getDownloadURL();
+                                  }
+                                  else{
+                                    downloadUrl=null;
+                                  }
+
+
+                                  databaseReference.child("Users").child("${AuthenticationHelper().auth2.currentUser!.uid}").set({
+                                    'Name': nameTextController.text,
+                                    // 'PhoneNumber': phNo,
+                                    'Email':emailController.text,
+                                    'Password':passwordController.text,
+                                    'UserGroupId':userGroupId,
+                                    'UserGroupName':userGroupName,
+                                    'imgUrl':downloadUrl,
+                                    'Uid':AuthenticationHelper().auth2.currentUser!.uid
+
+                                  });
+                                  await AuthenticationHelper().auth2.signOut();
+                                  AuthenticationHelper().signIn(email1: prefEmail,
+                                      password1: prefPassword);
+                                  setState(() {
+                                    isLoad=false;
+                                  });
+                                  Navigator.pop(context);
+                                  //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                } else {
+                                  setState(() {
+                                    isLoad=false;
+                                  });
+                                  CustomAlert().showMessage(result,context);
                                 }
-                                else{
-                                  downloadUrl=null;
-                                }
+                              });
+                            }
 
 
-                                databaseReference.child("Users").child("${AuthenticationHelper().auth2.currentUser!.uid}").set({
-                                  'Name': nameTextController.text,
-                                 // 'PhoneNumber': phNo,
-                                  'Email':emailController.text,
-                                  'Password':passwordController.text,
-                                  'UserGroupId':userGroupId,
-                                  'UserGroupName':userGroupName,
-                                  'imgUrl':downloadUrl
-
-                                });
-                               await AuthenticationHelper().auth2.signOut();
-                                AuthenticationHelper().signIn(email1: prefEmail,
-                                    password1: prefPassword);
-                                setState(() {
-                                  isLoad=false;
-                                });
-                                Navigator.pop(context);
-                              //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
-                              } else {
-                                setState(() {
-                                  isLoad=false;
-                                });
-                                CustomAlert().showMessage(result,context);
-                              }
-                            });
                           }
 
 

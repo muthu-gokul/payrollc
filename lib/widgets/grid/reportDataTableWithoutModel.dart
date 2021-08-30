@@ -38,12 +38,14 @@ class ReportDataTable2 extends StatefulWidget {
   List<dynamic>? gridData=[];
 
   int? selectedIndex;
+  String selectedUid;
   VoidCallback? voidCallback;
-  Function(int)? func;
+  Function(String,dynamic)? func;
   double? topMargin;//70 || 50
   double? gridBodyReduceHeight;// 260  // 140
 
-  ReportDataTable2({this.gridDataRowList,this.gridData,this.selectedIndex,this.voidCallback,this.func,this.topMargin,this.gridBodyReduceHeight});
+  ReportDataTable2({this.gridDataRowList,this.gridData,this.selectedIndex,this.voidCallback,this.func,
+    this.topMargin,this.gridBodyReduceHeight,required this.selectedUid});
   @override
   _ReportDataTable2State createState() => _ReportDataTable2State();
 }
@@ -202,14 +204,14 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                                   i,InkWell(
                                 //   onTap: widget.voidCallback,
                                 onTap: (){
-                                  widget.func!(i);
+                                  widget.func!(value['Uid'],value);
                                   //setState(() {});
                                 },
                                 child: Container(
 
                                   decoration: BoxDecoration(
                                     border: gridBottomborder,
-                                    color: widget.selectedIndex==i?yellowColor:gridBodyBgColor,
+                                    color: widget.selectedUid==value['Uid']?yellowColor:gridBodyBgColor,
                                   ),
                                   height: 50,
                                   margin: EdgeInsets.only(bottom:i==widget.gridData!.length-1?70: 0),
@@ -244,7 +246,7 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                                             ),
 
                                             child: Text("${value[v.columnName].toString().isNotEmpty?value[v.columnName]??" ":" "}",
-                                              style:widget.selectedIndex==i?TSWhite166:gridTextColor14,
+                                              style:widget.selectedUid==value['Uid']?TSWhite166:gridTextColor14,
                                             ),
                                           ):Container(
                                             width: v.width,
@@ -260,7 +262,7 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                                             ),
 
                                             child: Text("${value[v.columnName]!=null?DateFormat('dd-MM-yyyy').format(DateTime.parse(value[v.columnName])):" "}",
-                                              style:widget.selectedIndex==i?TSWhite166:gridTextColor14,
+                                              style:widget.selectedUid==value['Uid']?TSWhite166:gridTextColor14,
                                             ),
                                           )
                                               :Container(),
@@ -341,7 +343,7 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                             map((i, value) => MapEntry(
                                 i,InkWell(
                               onTap: (){
-                                widget.func!(i);
+                                widget.func!(value['Uid'],value);
                                 //setState(() {});
                               },
                               child:  Container(
@@ -350,7 +352,7 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                                 margin: EdgeInsets.only(bottom:i==widget.gridData!.length-1?70: 0),
                                 decoration: BoxDecoration(
                                   border: gridBottomborder,
-                                  color: widget.selectedIndex==i?yellowColor:gridBodyBgColor,
+                                  color: widget.selectedUid==value['Uid']?yellowColor:gridBodyBgColor,
 
                                 ),
                                 height: 50,
@@ -365,11 +367,11 @@ class _ReportDataTable2State extends State<ReportDataTable2> {
                                   child: FittedBox(
                                     fit: BoxFit.contain,
                                     child: !widget.gridDataRowList![0].isDate? Text("${value[widget.gridDataRowList![0].columnName]}",
-                                      style:widget.selectedIndex==i?TSWhite166:gridTextColor14,
+                                      style:widget.selectedUid==value['Uid']?TSWhite166:gridTextColor14,
                                     ):
                                     widget.gridDataRowList![0].columnName!=null?Text("${widget.gridDataRowList![0].columnName.toString().isNotEmpty?widget.gridDataRowList![0].columnName!=null?
                                     DateFormat('dd-MM-yyyy').format(DateTime.parse(value[widget.gridDataRowList![0].columnName])):" ":" "}",
-                                      style:widget.selectedIndex==i?TSWhite166:gridTextColor14,
+                                      style:widget.selectedUid==value['Uid']?TSWhite166:gridTextColor14,
                                     ):Container(),
                                   ),
                                 ),

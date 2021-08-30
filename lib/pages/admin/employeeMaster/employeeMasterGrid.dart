@@ -21,6 +21,8 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
   final dbRef = FirebaseDatabase.instance.reference().child("Users");
   List<dynamic> lists=[];
   int selectedIndex=-1;
+  String selectedUid="";
+  dynamic selectedValue={};
   bool showEdit=false;
   List<ReportGridStyleModel2> reportsGridColumnNameList=[
     ReportGridStyleModel2(columnName: "Name"),
@@ -86,10 +88,12 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                       lists.add(values);
                     });
 
-                   *//* Map<dynamic, dynamic> values = snapshot.data!.value;
+                   */
+            /* Map<dynamic, dynamic> values = snapshot.data!.value;
                     values.forEach((key, values) {
                       lists.add(values);
-                    });*//*
+                    });*/
+            /*
                     return ReportDataTable2(
                       topMargin: 50,
                       gridBodyReduceHeight: 140,
@@ -112,7 +116,8 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                           }
                       },
                     );
-                   *//* return new ListView.builder(
+                   */
+            /* return new ListView.builder(
                         shrinkWrap: true,
                         itemCount: lists.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -126,7 +131,8 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                               ],
                             ),
                           );
-                        });*//*
+                        });*/
+            /*
                   }
                   return Container(
                     height: SizeConfig.screenHeight,
@@ -135,23 +141,28 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                   );
                 }),*/
             ReportDataTable2(
-              topMargin: 50,
-              gridBodyReduceHeight: 140,
+              topMargin: 55,
+              gridBodyReduceHeight: 150,
               selectedIndex: selectedIndex,
+              selectedUid: selectedUid,
               gridData: lists,
               gridDataRowList: reportsGridColumnNameList,
-              func: (index){
-                if(selectedIndex==index){
+              func: (uid,value){
+
+                if(selectedUid==uid){
                   setState(() {
-                    selectedIndex=-1;
+                    selectedUid="";
+                    selectedValue={};
                     showEdit=false;
                   });
 
                 }
                 else{
                   setState(() {
-                    selectedIndex=index;
+                    selectedUid=uid;
+                    selectedValue=value;
                     showEdit=true;
+
                   });
                 }
               },
@@ -200,6 +211,16 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                           EditDelete(
                             showEdit: showEdit,
                             editTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew(
+                                isEdit: true,
+                                value: selectedValue,
+                              ))).then((value){
+                                setState(() {
+                                  showEdit=false;
+                                  selectedUid="";
+                                  selectedValue={};
+                                });
+                              });
 
                             },
                           ),
@@ -216,7 +237,10 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                 alignment: Alignment.bottomCenter,
                 child: AddButton(
                   ontap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew()));
+                    Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew(
+                      isEdit: false,
+                      value: {},
+                    )));
                   },
                   image: "assets/svg/plusIcon.svg",
                 )
