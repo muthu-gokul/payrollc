@@ -42,7 +42,11 @@ dependencies:
   intl:
   google_maps_flutter:
   geolocator:
-
+  location:
+  provider:
+  cached_network_image:
+  geocoder:
+    path: ./flutter_geocoder-master
 dev_dependencies:
   flutter_test:
     sdk: flutter

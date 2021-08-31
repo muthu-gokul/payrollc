@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api/authentication.dart';
 import 'constants/size.dart';
+import 'pages/generalUser/generalUserHomePage.dart';
 import 'widgets/alertDialog.dart';
 
 
@@ -117,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       await Permission.storage.request();
     }
      if(!status2.isGranted){
-      await Permission.location.request();
+      await Permission.locationAlways.request();
     }
     // final PermissionHandler _permissionHandler = PermissionHandler();
     // var result = await _permissionHandler.requestPermissions([PermissionGroup.storage]);
@@ -190,10 +191,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                dbRef.child(AuthenticationHelper().user.uid).once().then((value){
                                                  print(value.value);
                                                  setState(() {
-                                                   USERGROUPID=value.value['UserGroupId'];
+                                                   USERDETAIL=value.value;
                                                  });
-                                                 if(USERGROUPID==1){
+                                                 if(USERDETAIL['UserGroupId']==1){
                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                                 }
+                                                 if(USERDETAIL['UserGroupId']==2){
+                                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
                                                  }
                                                });
 

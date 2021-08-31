@@ -19,7 +19,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
 
  late String prefEmail;
  late String prefPassword;
- late int USERGROUPID;
+ late Map USERDETAIL;
 
 
  //rawScrollBar Properties
