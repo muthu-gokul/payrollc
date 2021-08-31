@@ -2,6 +2,7 @@ import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterAddNEw.dart';
+import 'package:cybertech/pages/admin/siteAssign/siteAssignPage.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/bottomBarAddButton.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
@@ -12,6 +13,7 @@ import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class SiteEmployeeGrid extends StatefulWidget {
   VoidCallback drawerCallback;
@@ -137,12 +139,17 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
 
                 }
                 else{
-                  setState(() {
+                  print(value);
+                 /* setState(() {
                     selectedUid=uid;
                     selectedValue=value;
-                    showEdit=true;
-
-                  });
+                  //  showEdit=true;
+                  });*/
+                  Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SiteAssignPage(
+                      siteList: siteList,employeeDetail: value,
+                      date: date==null?DateFormat("dd-MM-yyyy").format(DateTime.now()):
+                      DateFormat("dd-MM-yyyy").format(date!),
+                  )));
                 }
               },
             ),
