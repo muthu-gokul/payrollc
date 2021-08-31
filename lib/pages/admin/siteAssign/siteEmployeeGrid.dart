@@ -26,6 +26,7 @@ class SiteEmployeeGrid extends StatefulWidget {
 class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
   final dbRef = FirebaseDatabase.instance.reference().child("Users").orderByChild("UserGroupId").equalTo(2);
   final dbRef2 = FirebaseDatabase.instance.reference().child("SiteDetail");
+  final dbRef3 = FirebaseDatabase.instance.reference().child("SiteAssign");
   List<dynamic> lists=[];
   List<dynamic> siteList=[];
   int selectedIndex=-1;
@@ -65,6 +66,7 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
         });
       });
     });
+    date=DateTime.now();
     super.initState();
   }
 
@@ -86,7 +88,7 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                   NavBarIcon(
                     ontap: widget.drawerCallback,
                   ),
-                  Text("  Assign Site",
+                  Text("  Assign Site - ${DateFormat("dd/MM/yyyy").format(date!)}",
                     style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
                   ),
                   Spacer(),
@@ -139,17 +141,54 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
 
                 }
                 else{
+
                   print(value);
+                  List<dynamic> empSites=[];
+                  siteList.forEach((element) {
+                    setState(() {
+                      element['IsAdd']=false;
+                      empSites.add(element);
+                    });
+
+                  });
+
+
+                  dbRef3.child(DateFormat("dd-MM-yyyy").format(date!)).orderByKey().equalTo(value['Uid']).once().then((v){
+                    print(v.value);
+                   if(v.value!=null){
+                     //empSites=v.value[value['Uid']];
+                     empSites.forEach((element) {
+                       v.value[value['Uid']].forEach((ele) {
+                         if(element['Key']==ele['Key']){
+                           setState(() {
+                             element['IsAdd']=ele['IsAdd'];
+                           });
+
+                         }
+                       });
+                     });
+                     print(empSites);
+                   }
+                   else{
+                    // empSites=siteList;
+                   }
+                   Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SiteAssignPage(
+                      siteList: empSites,employeeDetail: value,
+                      date: date==null?DateFormat("dd-MM-yyyy").format(DateTime.now()):
+                      DateFormat("dd-MM-yyyy").format(date!),
+                    )
+                   )
+                  );
+                  });
+
+
                  /* setState(() {
                     selectedUid=uid;
                     selectedValue=value;
                   //  showEdit=true;
                   });*/
-                  Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SiteAssignPage(
-                      siteList: siteList,employeeDetail: value,
-                      date: date==null?DateFormat("dd-MM-yyyy").format(DateTime.now()):
-                      DateFormat("dd-MM-yyyy").format(date!),
-                  )));
+
+
                 }
               },
             ),

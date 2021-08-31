@@ -77,11 +77,11 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
         }
       });
     });
-    widget.siteList.forEach((ele){
+/*    widget.siteList.forEach((ele){
       setState(() {
         ele['IsAdd']=false;
       });
-    });
+    });*/
     super.initState();
   }
   AuthenticationHelper authenticationHelper=new AuthenticationHelper();
@@ -94,7 +94,7 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
         body: Stack(
           children: [
             NestedScrollView(
-              controller: silverController,
+             controller: silverController,
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverAppBar(
@@ -148,7 +148,8 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                 width: SizeConfig.screenWidth,
                 height: SizeConfig.screenHeight!-55,
                 clipBehavior: Clip.antiAlias,
-                margin: EdgeInsets.only(top: silverBodyTopMargin),
+                margin: EdgeInsets.only(top: 0),
+              //  margin: EdgeInsets.only(top: silverBodyTopMargin),
                 // padding: EdgeInsets.only(top: 50,bottom: 30),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(10),topRight: Radius.circular(10)),

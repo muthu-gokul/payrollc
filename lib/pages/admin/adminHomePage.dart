@@ -7,6 +7,8 @@ import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'mapScreen.dart';
 class AdminHomePage extends StatefulWidget {
   @override
   _AdminHomePageState createState() => _AdminHomePageState();
@@ -67,6 +69,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Track",
+                  ontap: (){
+                    setState(() {
+                      menuSel=4;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   ontap: (){
                     //  setState(() {
@@ -94,7 +105,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
         }):
         menuSel==3?SiteEmployeeGrid(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
-        }):Container(),
+        }):
+        menuSel==4?MapSample():Container(),
       ),
     );
   }

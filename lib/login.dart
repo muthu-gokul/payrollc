@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cybertech/pages/admin/adminHomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cybertech/constants/constants.dart';
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late SharedPreferences _Loginprefs;
   static const String useremail = 'email';
   static const String passwordd = 'password';
-
+  final dbRef = FirebaseDatabase.instance.reference().child("Users");
   AuthenticationHelper authenticationHelper=new AuthenticationHelper();
 
   void _loadCredentials() {
@@ -186,7 +187,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                              if (result == null) {
                                                print("UIS ${AuthenticationHelper().user}");
                                                _setCredentials(username.text, password.text);
-                                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                               dbRef.child(AuthenticationHelper().user.uid).once().then((value){
+                                                 print(value.value);
+                                                 setState(() {
+                                                   USERGROUPID=value.value['UserGroupId'];
+                                                 });
+                                                 if(USERGROUPID==1){
+                                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                                 }
+                                               });
+
+
                                              } else {
                                                CustomAlert().showMessage(result,context);
                                              }

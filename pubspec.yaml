@@ -40,6 +40,8 @@ dependencies:
   image_cropper:
   path:
   intl:
+  google_maps_flutter:
+  geolocator:
 
 dev_dependencies:
   flutter_test:
