@@ -3,6 +3,8 @@ import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/login.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterGrid.dart';
+import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
+import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 class AdminHomePage extends StatefulWidget {
@@ -47,6 +49,24 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Site Master",
+                  ontap: (){
+                    setState(() {
+                      menuSel=2;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
+                  title: "Site Assign",
+                  ontap: (){
+                    setState(() {
+                      menuSel=3;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   ontap: (){
                     //  setState(() {
@@ -67,6 +87,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
           ),
         ),
         body: menuSel==1?EmployeeMasterGrid(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        menuSel==2?SiteMasterGrid(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        menuSel==3?SiteEmployeeGrid(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):Container(),
       ),

@@ -8,20 +8,24 @@ import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class EmployeeMasterGrid extends StatefulWidget {
+class SiteEmployeeGrid extends StatefulWidget {
   VoidCallback drawerCallback;
-  EmployeeMasterGrid({required this.drawerCallback});
+  SiteEmployeeGrid({required this.drawerCallback});
 
   @override
-  _EmployeeMasterGridState createState() => _EmployeeMasterGridState();
+  _SiteEmployeeGridState createState() => _SiteEmployeeGridState();
 }
 
-class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
-  final dbRef = FirebaseDatabase.instance.reference().child("Users");
+class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
+  final dbRef = FirebaseDatabase.instance.reference().child("Users").orderByChild("UserGroupId").equalTo(2);
+  final dbRef2 = FirebaseDatabase.instance.reference().child("SiteDetail");
   List<dynamic> lists=[];
+  List<dynamic> siteList=[];
   int selectedIndex=-1;
   String selectedUid="";
   dynamic selectedValue={};
@@ -32,13 +36,13 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
     ReportGridStyleModel2(columnName: "UserGroupName"),
   ];
 
+  DateTime? date;
 
 
   @override
   void initState() {
     dbRef.onValue.listen((event) {
       lists.clear();
-
       DataSnapshot dataValues = event.snapshot;
       Map<dynamic, dynamic> values = dataValues.value;
       print("LIST CLESR $values");
@@ -46,9 +50,18 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
         setState(() {
           lists.add(values);
         });
-
       });
-
+    });
+    dbRef2.onValue.listen((event) {
+      siteList.clear();
+      DataSnapshot dataValues = event.snapshot;
+      Map<dynamic, dynamic> values = dataValues.value;
+      values.forEach((key, values) {
+        setState(() {
+          values['Key']=key;
+          siteList.add(values);
+        });
+      });
     });
     super.initState();
   }
@@ -71,77 +84,41 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                   NavBarIcon(
                     ontap: widget.drawerCallback,
                   ),
-                  Text("  Employee Master",
-                  style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
-                  )
+                  Text("  Assign Site",
+                    style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                      onTap: () async{
+                        final DateTime? picked = await showDatePicker2(
+                            context: context,
+                            initialDate:  date==null?DateTime.now():date!, // Refer step 1
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                            builder: (BuildContext context,Widget? child){
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: yellowColor, // header background color
+                                    onPrimary: Colors.white, // header text color
+                                    onSurface: grey, // body text color
+                                  ),
+
+                                ),
+                                child: child!,
+                              );
+                            });
+                        if (picked != null)
+                          setState(() {
+                            date = picked;
+                          });
+                      },
+                      child: SvgPicture.asset("assets/svg/calender.svg",color: Colors.white,height: 30,)
+                  ),
+                  SizedBox(width: 10,)
                 ],
               ),
             ),
-            /*StreamBuilder(
-                stream: dbRef.onValue,
-                builder: (context, AsyncSnapshot<Event> snapshot) {
-                  if (snapshot.hasData) {
-                    lists.clear();
-
-                    DataSnapshot dataValues = snapshot.data!.snapshot;
-                    Map<dynamic, dynamic> values = dataValues.value;
-                    print("LIST CLESR $values");
-                    values.forEach((key, values) {
-                      lists.add(values);
-                    });
-
-                   */
-            /* Map<dynamic, dynamic> values = snapshot.data!.value;
-                    values.forEach((key, values) {
-                      lists.add(values);
-                    });*/
-            /*
-                    return ReportDataTable2(
-                      topMargin: 50,
-                      gridBodyReduceHeight: 140,
-                      selectedIndex: selectedIndex,
-                      gridData: lists,
-                      gridDataRowList: reportsGridColumnNameList,
-                      func: (index){
-                         if(selectedIndex==index){
-                            setState(() {
-                              selectedIndex=-1;
-                              showEdit=false;
-                            });
-
-                          }
-                          else{
-                            setState(() {
-                              selectedIndex=index;
-                              showEdit=true;
-                            });
-                          }
-                      },
-                    );
-                   */
-            /* return new ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: lists.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text("Name: " + lists[index]["Name"]),
-                                Text("Age: "+ lists[index]["Email"]),
-                                Text("Type: " +lists[index]["UserGroupName"]),
-                              ],
-                            ),
-                          );
-                        });*/
-            /*
-                  }
-                  return Container(
-                    height: SizeConfig.screenHeight,
-                      width: SizeConfig.screenWidth,
-                      child: Center(child: CircularProgressIndicator())
-                  );
-                }),*/
             ReportDataTable2(
               topMargin: 55,
               gridBodyReduceHeight: 150,
@@ -172,7 +149,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
 
 
             //bottomNav
-            Positioned(
+         /*   Positioned(
               bottom: 0,
               child: Container(
                 width: SizeConfig.screenWidth,
@@ -227,21 +204,21 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                             },
                             deleteTap: (){
                               CustomAlert(
-                                callback: (){
-                                  AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                    FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
-                                     await AuthenticationHelper().user.delete();
-                                     AuthenticationHelper().signIn(email1: prefEmail,
-                                         password1: prefPassword);
-                                     Navigator.pop(context);
+                                  callback: (){
+                                    AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
+                                      FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
+                                        await AuthenticationHelper().user.delete();
+                                        AuthenticationHelper().signIn(email1: prefEmail,
+                                            password1: prefPassword);
+                                        Navigator.pop(context);
+                                      });
                                     });
-                                  });
 
 
-                                },
-                                Cancelcallback: (){
-                                  Navigator.pop(context);
-                                }
+                                  },
+                                  Cancelcallback: (){
+                                    Navigator.pop(context);
+                                  }
                               ).yesOrNoDialog(context, "", "Are you sure want to delete this user ?");
                             },
                           ),
@@ -265,7 +242,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                   },
                   image: "assets/svg/plusIcon.svg",
                 )
-            ),
+            ),*/
 
           ],
         ),

@@ -366,7 +366,22 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                            // AuthenticationHelper().signOut();
                          //   print(AuthenticationHelper().auth2.currentUser!.uid);
                             if(widget.isEdit){
-                              
+                              setState(() {
+                                isLoad=true;
+                              });
+                              if(nameTextController.text!=widget.value['Name']){
+                                databaseReference.child("Users").child(widget.value['Uid']).update({
+                                  'Name':nameTextController.text
+                                });
+                              }
+                              if(userGroupId!=widget.value['UserGroupId']){
+                                databaseReference.child("Users").child(widget.value['Uid']).update({
+                                  'UserGroupId':userGroupId,
+                                  'UserGroupName':userGroupName,
+                                });
+                              }
+
+                              Navigator.pop(context);
                             }
                             else{
                               AuthenticationHelper()
