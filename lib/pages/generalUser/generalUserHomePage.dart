@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'attendance/generalUserAttendance.dart';
+import 'dailyAssignedSites/generalUserDailySites.dart';
 
 class GeneralHomePage extends StatefulWidget {
   @override
@@ -47,6 +48,15 @@ class _GeneralHomePageState extends State<GeneralHomePage> {
                   ontap: (){
                     setState(() {
                       menuSel=1;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
+                  title: "Assigned Sites",
+                  ontap: (){
+                    setState(() {
+                      menuSel=2;
                     });
                     scaffoldKey.currentState!.openEndDrawer();
                   }
@@ -101,7 +111,7 @@ class _GeneralHomePageState extends State<GeneralHomePage> {
         body: menuSel==1?GeneralUserAttendance(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):
-        menuSel==2?SiteMasterGrid(drawerCallback: (){
+        menuSel==2?GeneralUserDailySites(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):
         menuSel==3?SiteEmployeeGrid(drawerCallback: (){

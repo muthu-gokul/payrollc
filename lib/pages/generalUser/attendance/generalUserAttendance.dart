@@ -85,15 +85,32 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
   @override
   void dispose() {
     _locationSubscription?.cancel();
-    setState(() {
+  //  setState(() {
       _locationSubscription = null;
-    });
+    //});
     super.dispose();
+  }
+  Map currentDayInfo={};
+  getCurrentDayInfo(){
+    dbRef.child(DateFormat("dd-MM-yyyy").format(DateTime.now())).child(USERDETAIL['Uid']).onValue.listen((value){
+      print("CDAY ${value.snapshot.value}");
+      if(value.snapshot.value==null){
+        setState(() {
+          currentDayInfo={};
+        });
+      }
+      else{
+        setState(() {
+          currentDayInfo=value.snapshot.value;
+        });
+      }
+    });
   }
 
   @override
   void initState() {
-    _listenLocation();
+   // _listenLocation();
+    getCurrentDayInfo();
     super.initState();
   }
 
@@ -146,9 +163,9 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                       //     child: Text('Login Successful!',style: TextStyle(color: Color(0XFF2D972A),fontSize: 20,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
                       // ),
                       // SizedBox(height: 5.0,),
-                      // Container(
-                      //    child: Text('18 Aug 2021 / 09:21 AM',style: TextStyle(color: Color(0XFF000000),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
-                      //  ),
+                      /*Container(
+                         child: Text('${DateFormat.jms().format(DateTime.parse(currentDayInfo['LoginTime']))}',style: TextStyle(color: Color(0XFF000000),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
+                       ),*/
                       // SizedBox(height:5.0,),
                       // Container(
                       //   width: width*0.27,
@@ -217,23 +234,23 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                       ) ,
                       SizedBox(height: 25.0,),
                       Text(first==null?"":"${first.featureName} : ${first.addressLine}"),
-                      GestureDetector(
+                      currentDayInfo.isEmpty?GestureDetector(
                         onTap: () async {
-                          print(_location);
-
-                          if(_location!=null){
-                            final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
-                            var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-                            var first = addresses.first;
-                            print("${first.featureName} : ${first.addressLine}");
-                          /*  dbRef.child("${DateFormat("dd-MM-yyyy").format(DateTime.now())}").child(USERDETAIL['Uid']).set({
+                        //  getCurrentDayInfo();
+                          _location=await location.getLocation();
+                          final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
+                          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                          var first = addresses.first;
+                          print("${first.featureName} : ${first.addressLine}");
+                            dbRef.child("${DateFormat("dd-MM-yyyy").format(DateTime.now())}").child(USERDETAIL['Uid']).set({
                               'Name':USERDETAIL['Name'],
                               'lat':_location!.latitude,
                               'longi':_location!.longitude,
                               'LoginTime':DateTime.now().toString(),
+                              'LoginAddress':"${first.featureName} : ${first.addressLine}"
 
-                            });*/
-                          }
+                            });
+
                         },
                         child: Container(
                           width: width*0.75,
@@ -245,9 +262,39 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                             // ],
                             color: Colors.indigoAccent,
                           ),
-                          child:Center(child: Text('Login',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
+                          child:Center(child: Text('Login',
+                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                         ),
-                      ),
+                      ):
+                      currentDayInfo['LogoutTime']==null?GestureDetector(
+                        onTap: () async {
+                          _location=await location.getLocation();
+                          final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
+                          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                          var first = addresses.first;
+                          print("${first.featureName} : ${first.addressLine}");
+                          dbRef.child("${DateFormat("dd-MM-yyyy").format(DateTime.now())}").child(USERDETAIL['Uid']).update({
+                            'lat':_location!.latitude,
+                            'longi':_location!.longitude,
+                            'LogoutTime':DateTime.now().toString(),
+                            'LogoutAddress':"${first.featureName} : ${first.addressLine}"
+                          });
+
+                        },
+                        child: Container(
+                          width: width*0.75,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            // boxShadow: [
+                            //   BoxShadow(color: Colors.green, spreadRadius: 3),
+                            // ],
+                            color: Colors.indigoAccent,
+                          ),
+                          child:Center(child: Text('LogOut',
+                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
+                        ),
+                      ):Container(),
                       SizedBox(height: 15.0,),
                     ],
                   ),

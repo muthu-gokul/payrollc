@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -120,6 +121,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
      if(!status2.isGranted){
       await Permission.locationAlways.request();
     }
+     if(status2.isGranted){
+       Location().requestService();
+     }
     // final PermissionHandler _permissionHandler = PermissionHandler();
     // var result = await _permissionHandler.requestPermissions([PermissionGroup.storage]);
     // if(result[PermissionGroup.storage] == PermissionStatus.granted) {
