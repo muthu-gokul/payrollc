@@ -31,7 +31,9 @@ if (keystorePropertiesFile.exists()) {
 }
 android {
     compileSdkVersion 30
-
+    lintOptions {
+        checkReleaseBuilds false
+    }
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.cybertech.cybertech"
@@ -39,6 +41,7 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
