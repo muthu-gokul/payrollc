@@ -147,6 +147,7 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                   siteList.forEach((element) {
                     setState(() {
                       element['IsAdd']=false;
+                      element['Name']=value['Name'];
                       empSites.add(element);
                     });
 

@@ -9,6 +9,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
  Color disableColor=Color(0xFFe8e8e8);
  Color uploadColor=Color(0xFFC7D0D8);
  Color indicatorColor=Color(0xFF1C1C1C);
+ Color red=Color(0xFFE34343);
 
  Border gridBottomborder= Border(bottom: BorderSide(color: addNewTextFieldBorder.withOpacity(0.5)));
  TextStyle bgColorTS14=TextStyle(fontFamily: 'RR',color: bgColor,fontSize: 14);

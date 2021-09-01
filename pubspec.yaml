@@ -45,6 +45,7 @@ dependencies:
   location:
   provider:
   cached_network_image:
+  location_permissions:
   geocoder:
     path: ./flutter_geocoder-master
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'loc.dart';
 import 'notifier/timeNotifier.dart';
 
 Future<void> main() async {
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         debugShowCheckedModeBanner: false,
-        home: LoginScreen(),
+       home: LoginScreen(),
+       // home: LOC(),
       ),
     );
   }

@@ -302,8 +302,9 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                 child: AddButton(
                   ontap: (){
                     List<dynamic> temp=widget.siteList.where((ele)=>ele['IsAdd']==true).toList();
-                    print(temp);
-                    if(temp.isNotEmpty){
+
+                    if(widget.siteList.isNotEmpty){
+                      print(temp);
                       databaseReference.child("SiteAssign").child(widget.date).child(widget.employeeDetail['Uid']).set(temp);
                       Navigator.pop(context);
                     }

@@ -34,9 +34,10 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
 
   final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
   var first;
+  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
   Future<void> _listenLocation() async {
     location.enableBackgroundMode(enable: true);
-    location.changeSettings(accuracy: LocationAccuracy.low,interval: 5000,);
+    location.changeSettings(accuracy: LocationAccuracy.low,interval: 2000,);
     //_location=location.getLocation() as LocationData?;
     _locationSubscription =
         location.onLocationChanged.handleError((dynamic err) {
@@ -54,28 +55,35 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
           var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
           if(first!=null){
             if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
-              setState(()  {
+              dbRef2.update({
+                'lat':currentLocation.latitude,
+                'long':currentLocation.longitude,
+              });
+              /*setState(()  {
                 _error = null;
                 _location = currentLocation;
                 first = addresses.first;
                // print(_location);
-
-              });
+              });*/
             }
           }
           else{
-            setState(()  {
+            dbRef2.update({
+              'lat':currentLocation.latitude,
+              'long':currentLocation.longitude,
+            });
+           /* setState(()  {
               _error = null;
               _location = currentLocation;
               first = addresses.first;
               print(" ${first.featureName} : ${first.addressLine}");
-            });
+            });*/
           }
         });
   //  setState(() {});
   }
 
-  Future<void> _stopListen() async {
+/*  Future<void> _stopListen() async {
     _locationSubscription?.cancel();
     setState(() {
       _locationSubscription = null;
@@ -89,7 +97,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
       _locationSubscription = null;
     //});
     super.dispose();
-  }
+  }*/
   Map currentDayInfo={};
   getCurrentDayInfo(){
     dbRef.child(DateFormat("dd-MM-yyyy").format(DateTime.now())).child(USERDETAIL['Uid']).onValue.listen((value){
@@ -109,10 +117,18 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
 
   @override
   void initState() {
-   // _listenLocation();
+    _listenLocation();
     getCurrentDayInfo();
     super.initState();
   }
+
+  @override
+  void didChangeDependencies() {
+    _listenLocation();
+    super.didChangeDependencies();
+  }
+
+
 
   @override
 

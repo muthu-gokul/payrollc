@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:location_permissions/location_permissions.dart' as locPer;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -110,20 +111,50 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     super.initState();
   }
-  //
+  Future<void> requestPermission(locPer.LocationPermissionLevel permissionLevel) async {
+    final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
+        .requestPermissions(permissionLevel: permissionLevel);
+
+    setState(() {
+      print("permissionRequestResult ${permissionRequestResult}");
+
+    });
+  }
   allowAccess() async{
     var status = await Permission.storage.status;
-    var status2 = await Permission.location.status;
+    var status2 = await Permission.locationAlways.status;
     var status3 = await Permission.locationWhenInUse.status;
     if (!status.isGranted) {
       await Permission.storage.request();
     }
-     if(!status2.isGranted){
-      await Permission.locationAlways.request();
+    print("status2 $status2");
+    print("status2.isGranted ${status2.isGranted}");
+    print("status2.isDenied ${status2.isDenied}");
+    print("status2.isRestricted ${status2.isRestricted}");
+
+    if(status2.isDenied){
+     // LocationPermissionLevel.locationAlways()
+      final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
+          .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);
+
+     // setState(() {
+        print("permissionRequestResult ${permissionRequestResult}");
+     // });
     }
-     if(status2.isGranted){
-       Location().requestService();
+/*     if(!status2.isGranted){
+       await Permission.locationAlways.request();
+    }
+     else if(status2.isDenied){
+       print("isDenied");
+       await Permission.locationAlways.request();
      }
+     else if(status2.isRestricted){
+       print("RESTRICTED");
+       await Permission.locationAlways.request();
+     }*/
+     /*if(status2.isGranted){
+       Location().requestService();
+     }*/
     // final PermissionHandler _permissionHandler = PermissionHandler();
     // var result = await _permissionHandler.requestPermissions([PermissionGroup.storage]);
     // if(result[PermissionGroup.storage] == PermissionStatus.granted) {
@@ -166,7 +197,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-
+                  /*  IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () {
+                        LocationPermissions().openAppSettings().then((bool hasOpened) =>
+                            debugPrint('App Settings opened: ' + hasOpened.toString()));
+                      },
+                    ),*/
                     SizedBox(height: _height * 0.15,),
                 //    SvgPicture.asset("assets/images/qms.svg",height: 100,),
                     SizedBox(height: 20,),
@@ -185,6 +222,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                     GestureDetector(
                                       onTap:() async {
                                          node.unfocus();
+                                     /*    final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
+                                             .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);*/
+                                         //requestPermission(locPer.LocationPermissionLevel.locationAlways);
                                          if(_loginFormKey.currentState!.validate() && !isEmailInvalid && !ispasswordInvalid){
                                            AuthenticationHelper()
                                                .signIn(email1: username.text, password1: password.text)
@@ -201,6 +241,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
                                                  }
                                                  if(USERDETAIL['UserGroupId']==2){
+                                                   FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
+                                                     'lat':"null",
+                                                     'long':"null"
+                                                   });
                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
                                                  }
                                                });

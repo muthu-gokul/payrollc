@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,19 +15,20 @@ class MapSampleState extends State<MapSample> {
   Completer<GoogleMapController> _controller = Completer();
   List<Marker> _markers = <Marker>[];
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(13.0650125, 80.1803574),
-    zoom: 14.4746,
-  );
+   late  CameraPosition _kGooglePlex;
 
   static final CameraPosition _kLake = CameraPosition(
       bearing: 92.8334901395799,
       target: LatLng(13.0650125, 80.1803574),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
+
+  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers");
   @override
   void initState() {
-    setState(() {
+    getCurrentlocation();
+
+/*    setState(() {
       _markers.add(
           Marker(
               markerId: MarkerId('SomeId'),
@@ -35,18 +37,24 @@ class MapSampleState extends State<MapSample> {
                   title: 'Gokul Cab'
               ),
               onTap: (){
-                showBottomModel();
+             //   showBottomModel();
               }
           )
       );
-    });
-//    getCurrentlocation();
+    });*/
+
     super.initState();
   }
 
 
   getCurrentlocation() async {
     final geoposition = await GeolocatorPlatform.instance.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+    setState(() {
+      _kGooglePlex = CameraPosition(
+        target: LatLng(geoposition.latitude, geoposition.longitude),
+        zoom: 10.4746,
+      );
+    });
     print("geoposition.latitude");
     print(geoposition.latitude);
     print(geoposition.longitude);
@@ -110,6 +118,32 @@ class MapSampleState extends State<MapSample> {
         initialCameraPosition: _kGooglePlex,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+          dbRef2.onValue.listen((event) {
+            if(event.snapshot.value!=null){
+              event.snapshot.value.forEach((k,v){
+                setState(() {
+                  _markers.add(
+                      Marker(
+                          markerId: MarkerId('${k}'),
+                          position:LatLng(v['lat'], v['long']),
+                          infoWindow: InfoWindow(
+                              title: 'Gokul Cab'
+                          ),
+                          onTap: (){
+                            //   showBottomModel();
+                          }
+                      )
+                  );
+                });
+              });
+
+            }
+            else{
+              setState(() {
+                _markers.clear();
+              });
+            }
+          });
         },
         onTap: (s){
           //print(s.toJson());

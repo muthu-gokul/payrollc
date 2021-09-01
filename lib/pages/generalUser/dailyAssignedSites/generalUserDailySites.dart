@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterAddNEw.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteAssignPage.dart';
+import 'package:cybertech/pages/generalUser/dailyAssignedSites/generalUserSiteLoginLogOut.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/bottomBarAddButton.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
@@ -12,8 +15,11 @@ import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 
 class GeneralUserDailySites extends StatefulWidget {
   VoidCallback drawerCallback;
@@ -28,36 +34,78 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
   final dbRef2 = FirebaseDatabase.instance.reference().child("SiteDetail");
   final dbRef3 = FirebaseDatabase.instance.reference().child("SiteAssign");
   List<dynamic> lists=[];
-  List<dynamic> siteList=[];
+  late List<dynamic> siteList;
   int selectedIndex=-1;
   String selectedUid="";
   dynamic selectedValue={};
   bool showEdit=false;
-  List<ReportGridStyleModel2> reportsGridColumnNameList=[
-    ReportGridStyleModel2(columnName: "Name"),
-    ReportGridStyleModel2(columnName: "Email"),
-    ReportGridStyleModel2(columnName: "UserGroupName"),
-  ];
-
   DateTime? date;
 
+  final Location location = Location();
+  LocationData? _location;
+  StreamSubscription<LocationData>? _locationSubscription;
+  var first;
+
+  Future<void> _listenLocation() async {
+    location.enableBackgroundMode(enable: true);
+    location.changeSettings(accuracy: LocationAccuracy.low,interval: 2000,);
+    //_location=location.getLocation() as LocationData?;
+    _locationSubscription =
+        location.onLocationChanged.handleError((dynamic err) {
+          if (err is PlatformException) {
+            /*setState(() {
+              _error = err.code;
+            });*/
+          }
+          _locationSubscription?.cancel();
+          setState(() {
+            _locationSubscription = null;
+          });
+        }).listen((LocationData currentLocation) async {
+          final coordinates = new Coordinates(currentLocation.latitude, currentLocation.longitude);
+          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+          if(first!=null){
+            if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
+              setState(()  {
+               // _error = null;
+                _location = currentLocation;
+                first = addresses.first;
+                // print(_location);
+                print("if ${first.featureName} : ${first.addressLine}");
+              });
+            }
+          }
+          else{
+            setState(()  {
+             // _error = null;
+              _location = currentLocation;
+              first = addresses.first;
+              print("else ${first.featureName} : ${first.addressLine}");
+            });
+          }
+        });
+    //  setState(() {});
+  }
 
   @override
   void initState() {
     date=DateTime.now();
     dbRef3.child(DateFormat("dd-MM-yyyy").format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {
-      siteList.clear();
-      DataSnapshot dataValues = event.snapshot;
 
+      DataSnapshot dataValues = event.snapshot;
+      print(dataValues.value);
       if(dataValues.value!=null){
         Map<dynamic, dynamic> values = dataValues.value;
         setState(() {
           siteList=dataValues.value[USERDETAIL['Uid']];
         });
-        print(siteList);
+      }
+      else{
+        siteList=[];
       }
     });
     date=DateTime.now();
+    _listenLocation();
     super.initState();
   }
 
@@ -89,10 +137,63 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
             Container(
               height: SizeConfig.screenHeight!-50,
               width: SizeConfig.screenWidth,
-              margin: EdgeInsets.only(top: 50),
+              margin: EdgeInsets.only(top: 70),
               child: ListView.builder(
                 itemCount: siteList.length,
                 itemBuilder: (ctx,i){
+                  return GestureDetector(
+                    onTap: () async {
+                      print("${first.addressLine}");
+                    /*  var loc=await location.getLocation();
+                      final coordinates = new Coordinates(loc.latitude, loc.longitude);
+                      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                      print("${addresses.first.addressLine}");
+                      print("await Location().isBackgroundModeEnabled() ${await Location().isBackgroundModeEnabled()}");
+                      print("await Location().requestService() ${await Location().requestService()}");
+                      print("await Location().serviceEnabled() ${await Location().serviceEnabled()}");*/
+                      if(_location!=null && await Location().isBackgroundModeEnabled()
+                          && await Location().requestService() && await Location().serviceEnabled()){
+                        print("HELLO IF");
+                        Navigator.push(context, MaterialPageRoute(builder: (ctx)=>GeneralUserSiteLoginLogOut(
+                          currentLocation: "${first.featureName} : ${first.addressLine}",
+                          index: i,
+                          latitude: _location!.latitude,
+                          longitude: _location!.longitude,
+                        )));
+                      }
+                      else{
+                        print("HELLO");
+                        var loc=await location.getLocation();
+                        setState((){
+                          _location=loc;
+                        });
+
+                        _listenLocation();
+                      }
+
+                    },
+                    child: Container(
+                      height: 60,
+                      width: SizeConfig.screenWidth!*0.95,
+                      margin: EdgeInsets.only(bottom: 20,left: 20,right: 20),
+                      padding: EdgeInsets.only(left: 20,right: 20),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.15),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: Offset(1, 8), // changes position of shadow
+                            )
+                          ]
+                      ),
+                      alignment: Alignment.centerLeft,
+                      child: Text("${siteList[i]['SiteName']}",style: gridTextColor14,),
+                      //child: Text("Thiruverkadu : No.134 Selva laxminagar 4 set, TTS Nagar, Thiruverkadu, Tamil Nadu 600077, India",style: gridTextColor14,),
+                    ),
+                  );
                   return Text(siteList[i]['SiteName']);
                 },
               ),
