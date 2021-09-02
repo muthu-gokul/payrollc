@@ -192,9 +192,16 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                       itemBuilder: (ctx,i){
                         return  GestureDetector(
                           onTap: (){
-                            setState(() {
-                              widget.siteList![i]['IsAdd']=!widget.siteList![i]['IsAdd'];
-                            });
+                            //SiteLoginTime
+                            if(widget.siteList![i]['SiteLoginTime']==null){
+                              setState(() {
+                                widget.siteList![i]['IsAdd']=!widget.siteList![i]['IsAdd'];
+                              });
+                            }
+                            else{
+                              CustomAlert().commonErrorAlert2(context, "Logged In", "User has Logged in Site. You cant change");
+                            }
+
                           },
                           child: Container(
                             height: 50,

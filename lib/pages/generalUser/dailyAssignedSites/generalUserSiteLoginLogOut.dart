@@ -30,7 +30,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
   int pageIndex=0;
   bool isEmployeeLogin=true;
   Map siteDetails={};
-  final dbRef=FirebaseDatabase.instance.reference().child("SiteAssign").child(DateFormat("dd-MM-yyyy").format(DateTime.now())).child(USERDETAIL['Uid']);
+  final dbRef=FirebaseDatabase.instance.reference().child("SiteAssign").child(DateFormat(dbDateFormat).format(DateTime.now())).child(USERDETAIL['Uid']);
   final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
 
   bool isLoad=false;
@@ -46,7 +46,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('SiteAssign')
-          .child(DateFormat("dd-MM-yyyy").format(DateTime.now()))
+          .child(DateFormat(dbDateFormat).format(DateTime.now()))
           .child(USERDETAIL['Uid'])
           .child("${widget.index}")
           .child("$i");

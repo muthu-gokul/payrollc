@@ -103,7 +103,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
   }*/
   Map currentDayInfo={};
   getCurrentDayInfo(){
-    dbRef.child(DateFormat("dd-MM-yyyy").format(DateTime.now())).child(USERDETAIL['Uid']).onValue.listen((value){
+    dbRef.child(DateFormat(dbDateFormat).format(DateTime.now())).child(USERDETAIL['Uid']).onValue.listen((value){
       print("CDAY ${value.snapshot.value}");
       if(value.snapshot.value==null){
         setState(() {
@@ -261,7 +261,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                           var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
                           var first = addresses.first;
                           print("${first.featureName} : ${first.addressLine}");
-                            dbRef.child("${DateFormat("dd-MM-yyyy").format(DateTime.now())}").child(USERDETAIL['Uid']).set({
+                            dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).set({
                               'Name':USERDETAIL['Name'],
                               'lat':_location!.latitude,
                               'longi':_location!.longitude,
@@ -292,7 +292,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                           var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
                           var first = addresses.first;
                           print("${first.featureName} : ${first.addressLine}");
-                          dbRef.child("${DateFormat("dd-MM-yyyy").format(DateTime.now())}").child(USERDETAIL['Uid']).update({
+                          dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).update({
                             'lat':_location!.latitude,
                             'longi':_location!.longitude,
                             'LogoutTime':DateTime.now().toString(),

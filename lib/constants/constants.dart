@@ -27,3 +27,8 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
   const Color srollBarColor=Colors.grey;
   const double scrollBarRadius=5.0;
   const double scrollBarThickness=4.0;
+
+ double attWidth=10;
+
+ Color attendanceMonthGridBodyBgColor=Color(0xFFF6F7F9);
+ String dbDateFormat="yyyy-MM-dd";

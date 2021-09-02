@@ -48,6 +48,8 @@ dependencies:
   location_permissions:
   geocoder:
     path: ./flutter_geocoder-master
+  month_picker_dialog:
+    path: ./month_picker_dialog-master
 dev_dependencies:
   flutter_test:
     sdk: flutter

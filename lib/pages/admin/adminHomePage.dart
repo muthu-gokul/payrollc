@@ -8,6 +8,7 @@ import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'attendanceReport/attendanceMonthWise.dart';
 import 'mapScreen.dart';
 class AdminHomePage extends StatefulWidget {
   @override
@@ -78,6 +79,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Attendance",
+                  ontap: (){
+                    setState(() {
+                      menuSel=5;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   ontap: (){
                     //  setState(() {
@@ -106,7 +116,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
         menuSel==3?SiteEmployeeGrid(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):
-        menuSel==4?MapSample():Container(),
+        menuSel==4?MapSample():
+        menuSel==5?AttendanceOverView(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):Container(),
       ),
     );
   }

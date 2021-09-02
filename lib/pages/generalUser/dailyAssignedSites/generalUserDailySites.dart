@@ -90,7 +90,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
   @override
   void initState() {
     date=DateTime.now();
-    dbRef3.child(DateFormat("dd-MM-yyyy").format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {
+    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {
 
       DataSnapshot dataValues = event.snapshot;
       print(dataValues.value);

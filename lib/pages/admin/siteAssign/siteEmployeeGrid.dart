@@ -154,7 +154,7 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                   });
 
 
-                  dbRef3.child(DateFormat("dd-MM-yyyy").format(date!)).orderByKey().equalTo(value['Uid']).once().then((v){
+                  dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(value['Uid']).once().then((v){
                     print(v.value);
                    if(v.value!=null){
                      //empSites=v.value[value['Uid']];
@@ -163,20 +163,21 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                          if(element['Key']==ele['Key']){
                            setState(() {
                              element['IsAdd']=ele['IsAdd'];
+                             element['SiteLoginTime']=ele['SiteLoginTime'];
                            });
 
                          }
                        });
                      });
-                     print(empSites);
+                     print("empSites $empSites");
                    }
                    else{
                     // empSites=siteList;
                    }
                    Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SiteAssignPage(
                       siteList: empSites,employeeDetail: value,
-                      date: date==null?DateFormat("dd-MM-yyyy").format(DateTime.now()):
-                      DateFormat("dd-MM-yyyy").format(date!),
+                      date: date==null?DateFormat(dbDateFormat).format(DateTime.now()):
+                      DateFormat(dbDateFormat).format(date!),
                     )
                    )
                   );
@@ -194,102 +195,6 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
               },
             ),
 
-
-            //bottomNav
-         /*   Positioned(
-              bottom: 0,
-              child: Container(
-                width: SizeConfig.screenWidth,
-                // height:_keyboardVisible?0:  70,
-                height: 65,
-
-                decoration: BoxDecoration(
-                    color: gridBodyBgColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: gridBodyBgColor,
-                        spreadRadius: 2,
-                        blurRadius: 15,
-                        offset: Offset(0, -20), // changes position of shadow
-                      )
-                    ]
-                ),
-                child: Stack(
-
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-
-                      ),
-                      margin:EdgeInsets.only(top: 0),
-                      child: CustomPaint(
-                        size: Size( SizeConfig.screenWidth!, 65),
-                        painter: RPSCustomPainter3(),
-                      ),
-                    ),
-
-                    Container(
-                      width:  SizeConfig.screenWidth,
-                      height: 80,
-                      child: Stack(
-
-                        children: [
-                          EditDelete(
-                            showEdit: showEdit,
-                            editTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew(
-                                isEdit: true,
-                                value: selectedValue,
-                              ))).then((value){
-                                setState(() {
-                                  showEdit=false;
-                                  selectedUid="";
-                                  selectedValue={};
-                                });
-                              });
-
-                            },
-                            deleteTap: (){
-                              CustomAlert(
-                                  callback: (){
-                                    AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                      FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
-                                        await AuthenticationHelper().user.delete();
-                                        AuthenticationHelper().signIn(email1: prefEmail,
-                                            password1: prefPassword);
-                                        Navigator.pop(context);
-                                      });
-                                    });
-
-
-                                  },
-                                  Cancelcallback: (){
-                                    Navigator.pop(context);
-                                  }
-                              ).yesOrNoDialog(context, "", "Are you sure want to delete this user ?");
-                            },
-                          ),
-
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            //Add Button
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: AddButton(
-                  ontap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew(
-                      isEdit: false,
-                      value: {},
-                    )));
-                  },
-                  image: "assets/svg/plusIcon.svg",
-                )
-            ),*/
 
           ],
         ),
