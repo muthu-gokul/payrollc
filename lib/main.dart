@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<TimeNotifier>(create: (_)=>TimeNotifier()),
+        ChangeNotifierProvider<LocationNotifier>(create: (_)=>LocationNotifier()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

@@ -1,7 +1,11 @@
 import 'dart:async';
 
+import 'package:cybertech/constants/constants.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 
 class TimeNotifier extends ChangeNotifier{
 
@@ -12,6 +16,7 @@ class TimeNotifier extends ChangeNotifier{
     timeInfo =DateFormat.jm().format(DateTime.parse(DateTime.now().toString()));
     notifyListeners();
   }
+
   @override
   void notifyListeners() {
     Timer(Duration(seconds: 1), (){
@@ -29,4 +34,78 @@ class TimeNotifier extends ChangeNotifier{
     super.addListener(listener);
   }
 
+}
+
+class LocationNotifier extends ChangeNotifier{
+
+  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
+  final Location location = Location();
+  LocationData? locationData;
+  var first;
+ bool isLocationServiceEnable=true;
+
+   listenLocation() async {
+
+    //locationData=location.getLocation() as LocationData?;
+    bool tempSErvice=await location.serviceEnabled();
+    print(tempSErvice);
+    print(isLocationServiceEnable);
+    if(isLocationServiceEnable != tempSErvice){
+      isLocationServiceEnable=tempSErvice;
+      location.enableBackgroundMode(enable: true);
+      location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
+    }
+    if(isLocationServiceEnable){
+      print("ENABLED");
+      locationData=await location.getLocation();
+      final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
+      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+     // print("56 --- ${addresses.first.addressLine}");
+      if(first!=null){
+        if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
+          dbRef2.update({
+            'lat':locationData!.latitude,
+            'long':locationData!.longitude,
+          });
+            first = addresses.first;
+        }
+        print(first.addressLine);
+      }
+      else{
+        dbRef2.update({
+          'lat':locationData!.latitude,
+          'long':locationData!.longitude,
+        });
+          first = addresses.first;
+        print(first.addressLine);
+      }
+    }
+    if(!tempSErvice && !isLocationServiceEnable){
+      Timer(Duration(seconds: 10), (){
+        location.enableBackgroundMode(enable: true);
+        location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
+      });
+    }
+    notifyListeners();
+
+
+  }
+  @override
+  void notifyListeners() {
+    Timer(Duration(seconds: 3), (){
+      listenLocation();
+     // batteryInfo();
+    });
+
+    super.notifyListeners();
+  }
+
+  @override
+  void addListener(void Function() listener) {
+    Timer(Duration(seconds: 3), (){
+      listenLocation();
+     // batteryInfo();
+    });
+    super.addListener(listener);
+  }
 }

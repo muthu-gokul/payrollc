@@ -27,15 +27,15 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
   GlobalKey <ScaffoldState> scaffoldkey=new GlobalKey<ScaffoldState>();
   late  double width,height,width2;
 
-  final Location location = Location();
+/*  final Location location = Location();
   LocationData? _location;
   StreamSubscription<LocationData>? _locationSubscription;
-  String? _error;
+  String? _error;*/
 
   final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
   var first;
   final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
-  Future<void> _listenLocation() async {
+/*  Future<void> _listenLocation() async {
     location.enableBackgroundMode(enable: true);
     location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
     //_location=location.getLocation() as LocationData?;
@@ -84,7 +84,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
           }
         });
   //  setState(() {});
-  }
+  }*/
 
 /*  Future<void> _stopListen() async {
     _locationSubscription?.cancel();
@@ -120,14 +120,14 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
 
   @override
   void initState() {
-    _listenLocation();
+  //  _listenLocation();
     getCurrentDayInfo();
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    _listenLocation();
+   // _listenLocation();
     super.didChangeDependencies();
   }
 
@@ -160,6 +160,10 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                     Container(
                       child: Text('Attendance',style: TextStyle(color: Color(0xffffffff),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
                     ),
+                    Consumer<LocationNotifier>(
+                        builder: (context,locNot,child)=> !locNot.isLocationServiceEnable?Icon(Icons.location_off_outlined,color: Colors.red,):
+                        Icon(Icons.location_on_outlined,color: Colors.red,)
+                    )
                   ],
                 ),
               ),
@@ -253,65 +257,78 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
                       ) ,
                       SizedBox(height: 25.0,),
                       Text(first==null?"":"${first.featureName} : ${first.addressLine}"),
-                      currentDayInfo.isEmpty?GestureDetector(
-                        onTap: () async {
-                        //  getCurrentDayInfo();
-                          _location=await location.getLocation();
-                          final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
-                          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-                          var first = addresses.first;
-                          print("${first.featureName} : ${first.addressLine}");
-                            dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).set({
-                              'Name':USERDETAIL['Name'],
-                              'lat':_location!.latitude,
-                              'longi':_location!.longitude,
-                              'LoginTime':DateTime.now().toString(),
-                              'LoginAddress':"${first.featureName} : ${first.addressLine}"
+                      currentDayInfo.isEmpty?Consumer<LocationNotifier>(
+                        builder: (context,locNot,child)=>  GestureDetector(
+                          onTap: () async {
+                          //  getCurrentDayInfo();
+                          //   _location=await location.getLocation();
+                          //   final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
+                          //   var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                          //   var first = addresses.first;
+                          //   print("${first.featureName} : ${first.addressLine}");
 
-                            });
+                            if(locNot.isLocationServiceEnable && locNot.locationData!=null && locNot.first!=null){
+                              dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).set({
+                                'Name':USERDETAIL['Name'],
+                                'lat':locNot.locationData!.latitude,
+                                'longi':locNot.locationData!.longitude,
+                                'LoginTime':DateTime.now().toString(),
+                                'LoginAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
 
-                        },
-                        child: Container(
-                          width: width*0.75,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            // boxShadow: [
-                            //   BoxShadow(color: Colors.green, spreadRadius: 3),
-                            // ],
-                            color: Colors.indigoAccent,
+                              });
+                            }
+
+
+
+                          },
+                          child: Container(
+                            width: width*0.75,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              // boxShadow: [
+                              //   BoxShadow(color: Colors.green, spreadRadius: 3),
+                              // ],
+                              color: Colors.indigoAccent,
+                            ),
+                            child:Center(child: Text('Login',
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                           ),
-                          child:Center(child: Text('Login',
-                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                         ),
                       ):
-                      currentDayInfo['LogoutTime']==null?GestureDetector(
-                        onTap: () async {
-                          _location=await location.getLocation();
-                          final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
-                          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-                          var first = addresses.first;
-                          print("${first.featureName} : ${first.addressLine}");
-                          dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).update({
-                            'lat':_location!.latitude,
-                            'longi':_location!.longitude,
-                            'LogoutTime':DateTime.now().toString(),
-                            'LogoutAddress':"${first.featureName} : ${first.addressLine}"
-                          });
+                      currentDayInfo['LogoutTime']==null?Consumer<LocationNotifier>(
+                        builder: (context,locNot,child)=> GestureDetector(
+                          onTap: () async {
+                            // _location=await location.getLocation();
+                            // final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
+                            // var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                            // var first = addresses.first;
+                            // print("${first.featureName} : ${first.addressLine}");
+                            if(locNot.isLocationServiceEnable && locNot.locationData!=null && locNot.first!=null){
+                              dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).update({
+                                'lat':locNot.locationData!.latitude,
+                                'longi':locNot.locationData!.longitude,
+                                'LogoutTime':DateTime.now().toString(),
+                                'LogoutAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
+                              });
+                            }
 
-                        },
-                        child: Container(
-                          width: width*0.75,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            // boxShadow: [
-                            //   BoxShadow(color: Colors.green, spreadRadius: 3),
-                            // ],
-                            color: Colors.indigoAccent,
+
+
+                          },
+                          child: Container(
+                            width: width*0.75,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              // boxShadow: [
+                              //   BoxShadow(color: Colors.green, spreadRadius: 3),
+                              // ],
+                              color: Colors.indigoAccent,
+                            ),
+                            child:Center(child: Text('LogOut',
+                              style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                           ),
-                          child:Center(child: Text('LogOut',
-                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                         ),
                       ):Container(),
                       SizedBox(height: 15.0,),

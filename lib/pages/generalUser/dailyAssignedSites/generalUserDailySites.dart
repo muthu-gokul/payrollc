@@ -105,7 +105,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
       }
     });
     date=DateTime.now();
-    _listenLocation();
+   // _listenLocation();
     super.initState();
   }
 
