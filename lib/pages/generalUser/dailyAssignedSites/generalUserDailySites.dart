@@ -190,7 +190,22 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
                           ]
                       ),
                       alignment: Alignment.centerLeft,
-                      child: Text("${siteList[i]['SiteName']}",style: gridTextColor14,),
+                      child: Row(
+                        children: [
+                          Container(
+                              width: (SizeConfig.screenWidth!*0.95)-76,
+                              child: Text("${siteList[i]['SiteName']}",style: gridTextColor14,)
+                          ),
+                          siteList[i]['SiteLoginTime']==null?Container():Container(
+                            height: 8,
+                            width: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:siteList[i]['SiteLogoutTime']==null? Colors.red:Colors.green
+                            ),
+                          )
+                        ],
+                      ),
                       //child: Text("Thiruverkadu : No.134 Selva laxminagar 4 set, TTS Nagar, Thiruverkadu, Tamil Nadu 600077, India",style: gridTextColor14,),
                     ),
                   );

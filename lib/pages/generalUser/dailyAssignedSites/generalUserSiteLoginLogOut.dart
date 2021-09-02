@@ -319,6 +319,9 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               ),
                             ),
                             SizedBox(height: 20,),
+                            siteDetails['SiteLogoutTime']==null?Container():
+                            Text("Logged Out at ${siteDetails['SiteLogoutTime']}"),
+                            SizedBox(height: 20,),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -326,7 +329,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                                 Container(
                                     alignment: Alignment.centerLeft,
                                     width: SizeConfig.screenWidth!*0.9,
-                                    child: Text("${widget.currentLocation}",
+                                    child: Text(siteDetails['SiteLogoutAddress']==null?"${widget.currentLocation}":"${siteDetails['SiteLogoutAddress']}",
                                       style: gridTextColor14,)
                                 ),
                               ],
