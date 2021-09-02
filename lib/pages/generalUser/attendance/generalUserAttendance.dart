@@ -37,7 +37,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
   final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
   Future<void> _listenLocation() async {
     location.enableBackgroundMode(enable: true);
-    location.changeSettings(accuracy: LocationAccuracy.low,interval: 2000,);
+    location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
     //_location=location.getLocation() as LocationData?;
     _locationSubscription =
         location.onLocationChanged.handleError((dynamic err) {
@@ -53,18 +53,20 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
         }).listen((LocationData currentLocation) async {
           final coordinates = new Coordinates(currentLocation.latitude, currentLocation.longitude);
           var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        //  print("56 --- ${addresses.first.addressLine}");
           if(first!=null){
             if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
               dbRef2.update({
                 'lat':currentLocation.latitude,
                 'long':currentLocation.longitude,
               });
-              /*setState(()  {
-                _error = null;
-                _location = currentLocation;
+              print("addresses.first if ${addresses.first.addressLine}");
+              setState(()  {
+            //    _error = null;
+              //  _location = currentLocation;
                 first = addresses.first;
                // print(_location);
-              });*/
+              });
             }
           }
           else{
@@ -72,12 +74,13 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
               'lat':currentLocation.latitude,
               'long':currentLocation.longitude,
             });
-           /* setState(()  {
-              _error = null;
-              _location = currentLocation;
+            print("addresses.first else ${addresses.first.addressLine}");
+            setState(()  {
+          //    _error = null;
+            //  _location = currentLocation;
               first = addresses.first;
-              print(" ${first.featureName} : ${first.addressLine}");
-            });*/
+           //   print(" ${first.featureName} : ${first.addressLine}");
+            });
           }
         });
   //  setState(() {});

@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/notifier/timeNotifier.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/arrowBack.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
+import 'package:cybertech/widgets/customTextField.dart';
+import 'package:cybertech/widgets/loader.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 class GeneralUserSiteLoginLogOut extends StatefulWidget {
@@ -26,6 +32,35 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
   Map siteDetails={};
   final dbRef=FirebaseDatabase.instance.reference().child("SiteAssign").child(DateFormat("dd-MM-yyyy").format(DateTime.now())).child(USERDETAIL['Uid']);
   final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
+
+  bool isLoad=false;
+  final picker = ImagePicker();
+  List<XFile>? images=[];
+
+  Future<List<String>> uploadImages(List<XFile>? images) async {
+  //  if (images.length < 1) return "null";
+
+    List<String> _downloadUrls = [];
+    int i=0;
+    await Future.forEach(images!, (image) async {
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('SiteAssign')
+          .child(DateFormat("dd-MM-yyyy").format(DateTime.now()))
+          .child(USERDETAIL['Uid'])
+          .child("${widget.index}")
+          .child("$i");
+
+      final UploadTask uploadTask = ref.putFile(File(images[i].path));
+      final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+      final url = await taskSnapshot.ref.getDownloadURL();
+      _downloadUrls.add(url);
+      i++;
+    });
+
+    return _downloadUrls;
+  }
+
   @override
   void initState() {
     dbRef.child("${widget.index}").onValue.listen((event) {
@@ -49,6 +84,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
     final node=FocusScope.of(context);
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
           height: SizeConfig.screenHeight,
           width: SizeConfig.screenWidth,
@@ -178,6 +214,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               ),
                             ),
                             SizedBox(height: 20,),
+                            siteDetails['SiteLoginTime']==null?Container():
+                                Text("Logged in at ${siteDetails['SiteLoginTime']}"),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -221,7 +259,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                       ),
                       Container(
                         margin: EdgeInsets.only(top: 45),
-                        height: SizeConfig.screenHeight!-50,
+                        height: SizeConfig.screenHeight!-100,
                         width: SizeConfig.screenWidth,
                         child: ListView(
                           children: [
@@ -253,20 +291,6 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      /* final TimeOfDay picked = await showTimePicker(
-                                              context: context,
-                                              initialTime: ean.selectedTime==null?TimeOfDay.now():ean.selectedTime,
-
-                                            );
-                                            if (picked != null){
-                                              print(picked);
-                                            }
-                                              setState(() {
-                                                ean.selectedTime=picked;
-                                                ean.time = formatDate(
-                                                    DateTime(2019, 08, 1, ean.selectedTime.hour, ean.selectedTime.minute),
-                                                    [hh, ':', nn, " ", am]).toString();
-                                              });*/
                                     },
                                     child:Container(
                                       height: 50,
@@ -306,10 +330,52 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                                       style: gridTextColor14,)
                                 ),
                               ],
-                            )
+                            ),
+                            SizedBox(height: 50,),
+                            Container(
+                                height: 100,
+                                child: GridView.count(
+                              crossAxisCount: 3,
+                              children: List.generate(images!.length, (index) {
+                                return Image.file(File(images![index].path));
+                              }),
+                            )),
+                            GestureDetector(
+                              onTap: () async{
+
+                               images  = await picker.pickMultiImage();
+
+                                setState(() {
+
+                                });
+
+                              },
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  height: 50,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    color: yellowColor
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            AddNewLabelTextField(
+                              maxlines: null,
+                              onChange: (v){},
+                              labelText: "Remarks",
+                              onEditComplete: (){
+                                node.unfocus();
+                              },
+                              scrollPadding: 1000,
+                            ),
+                            SizedBox(height: 300,)
                           ],
                         ),
-                      )
+                      ),
 
                     ],
                   ),
@@ -440,7 +506,37 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         });
                       }
                       else{
-                        CustomAlert().commonErrorAlert2(context, "Already Logged In", "");
+                        CustomAlert().commonErrorAlert2(context, "Already Logged In...", "");
+                      }
+
+                    }
+                    else{
+                      if(siteDetails['SiteLogoutTime']==null){
+                        if(images!.isNotEmpty){
+                          setState(() {
+                            isLoad=true;
+                          });
+                          uploadImages(images).then((value){
+                            print(value);
+                            dbRef.child("${widget.index}").update({
+                              'SiteLogoutTime':DateTime.now().toString(),
+                              'SiteLogoutAddress':widget.currentLocation,
+                              'SiteLogoutLatitude':widget.latitude,
+                              'SiteLogoutLongitude':widget.longitude,
+                              'Images':value
+                            });
+                            dbRef2.update({
+                              'lat':widget.latitude,
+                              'long':widget.longitude,
+                            });
+                            setState(() {
+                              isLoad=false;
+                            });
+                          });
+                        }
+                      }
+                      else{
+                        CustomAlert().commonErrorAlert2(context, "Already Logged Out...", "");
                       }
 
                     }
@@ -467,6 +563,11 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                     ),
                   ),
                 ),
+              ),
+
+
+              Loader(
+                isLoad: isLoad,
               ),
             ],
           ),

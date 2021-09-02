@@ -118,6 +118,7 @@ class MapSampleState extends State<MapSample> {
         initialCameraPosition: _kGooglePlex,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+          _markers.clear();
           dbRef2.onValue.listen((event) {
             if(event.snapshot.value!=null){
               event.snapshot.value.forEach((k,v){

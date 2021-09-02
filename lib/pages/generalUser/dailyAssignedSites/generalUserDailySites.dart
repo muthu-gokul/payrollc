@@ -48,7 +48,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
 
   Future<void> _listenLocation() async {
     location.enableBackgroundMode(enable: true);
-    location.changeSettings(accuracy: LocationAccuracy.low,interval: 2000,);
+    location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
     //_location=location.getLocation() as LocationData?;
     _locationSubscription =
         location.onLocationChanged.handleError((dynamic err) {
