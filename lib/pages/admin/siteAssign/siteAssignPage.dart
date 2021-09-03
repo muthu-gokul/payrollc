@@ -308,11 +308,12 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                 alignment: Alignment.bottomCenter,
                 child: AddButton(
                   ontap: (){
-                    List<dynamic> temp=widget.siteList.where((ele)=>ele['IsAdd']==true).toList();
+                    //List<dynamic> temp=widget.siteList.where((ele)=>ele['IsAdd']==true).toList();
+                  //  List<dynamic> temp=widget.siteList;
 
                     if(widget.siteList.isNotEmpty){
-                      print(temp);
-                      databaseReference.child("SiteAssign").child(widget.date).child(widget.employeeDetail['Uid']).set(temp);
+                      print(widget.siteList);
+                      databaseReference.child("SiteAssign").child(widget.date).child(widget.employeeDetail['Uid']).set(widget.siteList);
                       Navigator.pop(context);
                     }
                     else{

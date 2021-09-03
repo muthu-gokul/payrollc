@@ -162,8 +162,17 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                        v.value[value['Uid']].forEach((ele) {
                          if(element['Key']==ele['Key']){
                            setState(() {
+                             element['Images']=ele['Images'];
                              element['IsAdd']=ele['IsAdd'];
                              element['SiteLoginTime']=ele['SiteLoginTime'];
+                             element['SiteLoginAddress']=ele['SiteLoginAddress'];
+                             element['SiteLoginLatitude']=ele['SiteLoginLatitude'];
+                             element['SiteLoginLongitude']=ele['SiteLoginLongitude'];
+                             element['SiteLogoutTime']=ele['SiteLogoutTime'];
+                             element['SiteLogoutAddress']=ele['SiteLogoutAddress'];
+                             element['SiteLogoutLatitude']=ele['SiteLogoutLatitude'];
+                             element['SiteLogoutLongitude']=ele['SiteLogoutLongitude'];
+                             element['Remarks']=ele['Remarks'];
                            });
 
                          }

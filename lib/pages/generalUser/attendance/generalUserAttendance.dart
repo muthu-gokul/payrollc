@@ -23,7 +23,7 @@ class GeneralUserAttendance extends StatefulWidget {
   _GeneralUserAttendanceState createState() => _GeneralUserAttendanceState();
 }
 
-class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
+class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with WidgetsBindingObserver{
   GlobalKey <ScaffoldState> scaffoldkey=new GlobalKey<ScaffoldState>();
   late  double width,height,width2;
 
@@ -125,12 +125,43 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
     getCurrentDayInfo();
     super.initState();
   }
+/*  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if(state == AppLifecycleState.paused){
+      print("PAUSED");
+      if (!mounted) return;
+
+
+    }
+    if(state == AppLifecycleState.resumed){
+      print("resumed");
+
+
+    }
+    if(state==AppLifecycleState.inactive){
+
+      print("inactive");
+
+      // if(selectedNotificationPayload==null){
+
+      if (!mounted) return;
+
+
+    }
+    if(state==AppLifecycleState.detached){
+      print("detached");
+      if (!mounted) return;
+
+    }
+  }
 
   @override
   void didChangeDependencies() {
    // _listenLocation();
     super.didChangeDependencies();
-  }
+  }*/
 
 
 

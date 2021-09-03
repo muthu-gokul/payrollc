@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart' as permi;
 
 class TimeNotifier extends ChangeNotifier{
 
@@ -48,8 +49,9 @@ class LocationNotifier extends ChangeNotifier{
 
     //locationData=location.getLocation() as LocationData?;
     bool tempSErvice=await location.serviceEnabled();
-  //  print(tempSErvice);
-  //  print(isLocationServiceEnable);
+
+
+  //s  print(isLocationServiceEnable);
     if(isLocationServiceEnable != tempSErvice){
       isLocationServiceEnable=tempSErvice;
       location.enableBackgroundMode(enable: true);
@@ -81,6 +83,13 @@ class LocationNotifier extends ChangeNotifier{
     if(isLocationServiceEnable){
       if(!await Location().isBackgroundModeEnabled()){
         location.enableBackgroundMode(enable: true);
+      }
+      if(locationData==null|| first ==null){
+        locationData=await location.getLocation();
+        final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
+        var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        first = addresses.first;
+        notifyListeners();
       }
 
       location.onLocationChanged.listen((event) async {
@@ -138,6 +147,7 @@ class LocationNotifier extends ChangeNotifier{
       Timer(Duration(seconds: 10), (){
         location.enableBackgroundMode(enable: true);
         location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
+
       });
     }
     notifyListeners();

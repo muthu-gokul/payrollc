@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/login.dart';
+import 'package:cybertech/notifier/timeNotifier.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterGrid.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import 'attendance/generalUserAttendance.dart';
 import 'dailyAssignedSites/generalUserDailySites.dart';
@@ -16,10 +20,66 @@ class GeneralHomePage extends StatefulWidget {
   _GeneralHomePageState createState() => _GeneralHomePageState();
 }
 
-class _GeneralHomePageState extends State<GeneralHomePage> {
+class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingObserver{
 
   GlobalKey <ScaffoldState> scaffoldKey=new GlobalKey<ScaffoldState>();
   int menuSel=1;
+
+  late Timer timer;
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if(state == AppLifecycleState.paused){
+      print("PAUSED");
+      if (!mounted) return;
+
+
+    }
+    if(state == AppLifecycleState.resumed){
+      print("resumed");
+      if(timer.isActive){
+        timer.cancel();
+      }
+
+    }
+    if(state==AppLifecycleState.inactive){
+
+      print("inactive");
+      timer= Timer.periodic(Duration(seconds: 30), (timer) {
+        if(context!=null){
+          print("MM");
+          Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+        }
+      });
+      // if(selectedNotificationPayload==null){
+
+      if (!mounted) return;
+
+
+    }
+    if(state==AppLifecycleState.detached){
+      print("detached");
+      if (!mounted) return;
+
+    }
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addObserver(this);
+    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

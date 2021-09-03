@@ -37,6 +37,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
   final picker = ImagePicker();
   List<XFile>? images=[];
 
+  TextEditingController remarks=new TextEditingController();
+
   Future<List<String>> uploadImages(List<XFile>? images) async {
   //  if (images.length < 1) return "null";
 
@@ -66,9 +68,9 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
     dbRef.child("${widget.index}").onValue.listen((event) {
       print(event.snapshot.value);
       if(event.snapshot.value!=null){
-       // setState(() {
+        setState(() {
           siteDetails=event.snapshot.value;
-       // });
+        });
       }
     });
 
@@ -346,7 +348,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             GestureDetector(
                               onTap: () async{
 
-                               images  = await picker.pickMultiImage();
+                               images  = await picker.pickMultiImage(imageQuality: 50);
 
                                 setState(() {
 
@@ -367,6 +369,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             ),
 
                             AddNewLabelTextField(
+                              textEditingController: remarks,
                               maxlines: null,
                               onChange: (v){},
                               labelText: "Remarks",
@@ -495,8 +498,12 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                 alignment: Alignment.bottomCenter,
                 child: GestureDetector(
                   onTap: (){
+
                     if(isEmployeeLogin){
                       if(siteDetails['SiteLoginTime']==null){
+                        setState(() {
+                          isLoad=true;
+                        });
                         dbRef.child("${widget.index}").update({
                           'SiteLoginTime':DateTime.now().toString(),
                           'SiteLoginAddress':widget.currentLocation,
@@ -507,18 +514,21 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                           'lat':widget.latitude,
                           'long':widget.longitude,
                         });
+                        setState(() {
+                          isLoad=false;
+                        });
                       }
                       else{
                         CustomAlert().commonErrorAlert2(context, "Already Logged In...", "");
                       }
-
                     }
                     else{
                       if(siteDetails['SiteLogoutTime']==null){
+                        setState(() {
+                          isLoad=true;
+                        });
                         if(images!.isNotEmpty){
-                          setState(() {
-                            isLoad=true;
-                          });
+
                           uploadImages(images).then((value){
                             print(value);
                             dbRef.child("${widget.index}").update({
@@ -526,7 +536,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               'SiteLogoutAddress':widget.currentLocation,
                               'SiteLogoutLatitude':widget.latitude,
                               'SiteLogoutLongitude':widget.longitude,
-                              'Images':value
+                              'Images':value,
+                              'Remarks':remarks.text
                             });
                             dbRef2.update({
                               'lat':widget.latitude,
@@ -535,6 +546,22 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             setState(() {
                               isLoad=false;
                             });
+                          });
+                        }
+                        else{
+                          dbRef.child("${widget.index}").update({
+                            'SiteLogoutTime':DateTime.now().toString(),
+                            'SiteLogoutAddress':widget.currentLocation,
+                            'SiteLogoutLatitude':widget.latitude,
+                            'SiteLogoutLongitude':widget.longitude,
+                            'Remarks':remarks.text
+                          });
+                          dbRef2.update({
+                            'lat':widget.latitude,
+                            'long':widget.longitude,
+                          });
+                          setState(() {
+                            isLoad=false;
                           });
                         }
                       }

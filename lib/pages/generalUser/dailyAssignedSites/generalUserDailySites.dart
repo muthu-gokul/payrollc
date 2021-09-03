@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
@@ -92,7 +93,34 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
   @override
   void initState() {
     date=DateTime.now();
-    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {
+/*    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).once().then((value){
+      log("ALL SITES ${value.value}");
+      if(value.value!=null){
+        List<dynamic> tempList=value.value[USERDETAIL['Uid']];
+        setState(() {
+          siteList=tempList.where((element) => element['IsAdd']==true).toList();
+        });
+
+      }
+      else{
+        siteList=[];
+      }
+    });*/
+
+    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((value){
+      log("ALL SITES ${value.snapshot.value}");
+      if(value.snapshot.value!=null){
+        List<dynamic> tempList=value.snapshot.value[USERDETAIL['Uid']];
+        setState(() {
+          siteList=tempList.where((element) => element['IsAdd']==true).toList();
+        });
+
+      }
+      else{
+        siteList=[];
+      }
+    });
+/*    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {
 
       DataSnapshot dataValues = event.snapshot;
       print(dataValues.value);
@@ -105,7 +133,11 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
       else{
         siteList=[];
       }
-    });
+      setState(() {
+        siteList.sort((a, b) => a['SiteLoginTime'].toString().compareTo(b['SiteLoginTime'].toString()));
+      });
+
+    });*/
     date=DateTime.now();
    // _listenLocation();
     super.initState();
@@ -154,6 +186,8 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
                         print("await Location().isBackgroundModeEnabled() ${await Location().isBackgroundModeEnabled()}");
                         print("await Location().requestService() ${await Location().requestService()}");
                         print("await Location().serviceEnabled() ${await Location().serviceEnabled()}");
+                        print("locNot.locationData ${locNot.locationData}");
+                        print("locNot.locationData ${locNot.first}");
                         if(locNot.locationData!=null ){
                           print("HELLO IF");
                           Navigator.push(context, MaterialPageRoute(builder: (ctx)=>GeneralUserSiteLoginLogOut(
@@ -166,7 +200,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
                         else{
                           print("HELLO");
                           locNot.listenLocation();
-                    /*      var loc=await location.getLocation();
+                          /*      var loc=await location.getLocation();
                           setState((){
                             _location=loc;
                           });
