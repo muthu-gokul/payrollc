@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
+import 'package:cybertech/pages/admin/attendanceReport/attendanceCardViewEmployeeDetails.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -143,13 +144,17 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
                 if(v.containsKey(element['Uid'])){
                   setState(() {
                     element[k]='P';
-                    element['Details'].add([
-                      {'$k':'P'},
-                      {'LoginTime':v[element['Uid']]['LoginTime']},
-                      {'LogoutTime':v[element['Uid']]['LogoutTime']},
-                      {'LoginAddress':v[element['Uid']]['LoginAddress']},
-                      {'LogoutAddress':v[element['Uid']]['LogoutAddress']},
-                    ]);
+                    element['Details'].add(
+                        {
+                          //'$k':'P',
+                          'Date':'$k',
+                          'Attendance':'P',
+                          'LoginTime':v[element['Uid']]['LoginTime'],
+                          'LogoutTime':v[element['Uid']]['LogoutTime'],
+                          'LoginAddress':v[element['Uid']]['LoginAddress'],
+                          'LogoutAddress':v[element['Uid']]['LogoutAddress']
+                        }
+                    );
                   /*  element['${k}_List']=[
                       {'$k':'P'},
                       {'LoginTime':v[element['Uid']]['LoginTime']},
@@ -162,13 +167,13 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
                 else{
                   setState(() {
                     element[k]='A';
-                    element['Details'].add([
-                      {'$k':'A'},
-                      // {'LoginTime':v[element['Uid']]['LoginTime']},
-                      // {'LogoutTime':v[element['Uid']]['LogoutTime']},
-                      // {'LoginAddress':v[element['Uid']]['LoginAddress']},
-                      // {'LogoutAddress':v[element['Uid']]['LogoutAddress']},
-                    ]);
+                    element['Details'].add(
+                        {
+                         // '$k':'A',
+                          'Date':'$k',
+                          'Attendance':'A',
+                        }
+                    );
                     /*element['${k}_List']=[
                       {k:'A'},
                      // {'LoginTime':v[element['Uid']]['LoginTime']},
@@ -182,13 +187,19 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
               else{
                 setState(() {
                   element[k]='A';
-                  element['Details'].add([
+                  element['Details'].add(
+                      {
+                        'Date':'$k',
+                        'Attendance':'A',
+                      }
+                  );
+                  /*element['Details'].add([
                     {'$k':'A'},
                     // {'LoginTime':v[element['Uid']]['LoginTime']},
                     // {'LogoutTime':v[element['Uid']]['LogoutTime']},
                     // {'LoginAddress':v[element['Uid']]['LoginAddress']},
                     // {'LogoutAddress':v[element['Uid']]['LogoutAddress']},
-                  ]);
+                  ]);*/
                  /* element['${k}_List']=[
                     {k:'A'},
                     // {'LoginTime':v[element['Uid']]['LoginTime']},
@@ -254,82 +265,6 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
                             if (date != null) {
                               print(date);
                               getUsers(date);
-                             // getAttendance(date);
-                           /*   setState(() {
-                                picked.clear();
-                                gridHeaderList.clear();
-                                gridHeaderList.add( AttendanceMonthGridStyleModel(columnName: "Name"));
-                                selectedDate = date;
-                                print(selectedDate!.month==DateTime.now().month);
-
-                                var firstDayThisMonth = new DateTime(date.year, date.month, date.day);
-                                var firstDayNextMonth = new DateTime(firstDayThisMonth.year, firstDayThisMonth.month + 1, firstDayThisMonth.day);
-                                final List<DateTime> days = [];
-                                if(selectedDate!.month==DateTime.now().month){
-                                  for (int i = 0; i <= DateTime.now().difference(firstDayThisMonth).inDays; i++) {
-                                    gridHeaderList.add( AttendanceMonthGridStyleModel(
-                                        columnName: DateFormat(dbDateFormat).format(firstDayThisMonth.add(Duration(days: i))),
-                                        isDate: true,width: 50));
-                                 //   days.add(firstDayThisMonth.add(Duration(days: i)));
-                                  }
-                                }
-                                else{
-                                  for (int i = 0; i < firstDayNextMonth.difference(firstDayThisMonth).inDays; i++) {
-                                    gridHeaderList.add( AttendanceMonthGridStyleModel(
-                                        columnName: DateFormat(dbDateFormat).format(firstDayThisMonth.add(Duration(days: i))),
-                                        isDate: true,width: 50));
-                                   // days.add(firstDayThisMonth.add(Duration(days: i)));
-                                  }
-                                }
-
-                                log("DATES $days");
-
-                               picked.add(selectedDate!);
-                               picked.add( DateTime(date.year, date.month, firstDayNextMonth.difference(firstDayThisMonth).inDays));
-
-                               print(DateFormat(dbDateFormat).format(picked[0]));
-                               print(DateFormat(dbDateFormat).format(picked[1]));
-                               dbRef.orderByKey()
-                                .startAt("${DateFormat(dbDateFormat).format(picked[0])}")
-                                .endAt("${DateFormat(dbDateFormat).format(picked[1])}")
-                                .once().then((value){
-
-                                  if(value.value!=null){
-                                    log("${value.value}");
-                                    log("${value.value.length}");
-                                    value.value.forEach((k,v){
-                                    //  gridHeaderList.add( AttendanceMonthGridStyleModel(columnName: k,isDate: true,width: 50));
-                                      print("KEY $k     VALUE $v");
-                                      users.forEach((element) {
-                                        if(gridHeaderList.any((element) => element.columnName==k)){
-                                          if(v.containsKey(element['Uid'])){
-                                            setState(() {
-                                              element[k]='P';
-                                            });
-                                          }
-                                          else{
-                                            setState(() {
-                                              element[k]='A';
-                                            });
-                                          }
-                                        }
-                                        else{
-                                          setState(() {
-                                            element[k]='A';
-                                          });
-                                        }
-
-                                      });
-                                    });
-                                  }
-
-                                  setState(() {
-                                    data=users;
-                                  });
-                                  log("OUTPUT USERS $users");
-                               });
-
-                              });*/
                             }
                           });
                         },
@@ -362,19 +297,7 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
                 ),
               ),
               SizedBox(height: 10,),
-              Container(
-                height: 100,
-                child: ListView.builder(
-                  itemCount: users.length,
-                  itemBuilder: (ctx,i){
-                    return InkWell(
-                        onTap: (){
-                          log("LIST OF USERS : $users");
-                        },
-                        child: Text("${users[i]['Name']}"));
-                  },
-                ),
-              ),
+
               AttendanceMonthGrid (
                 voidCallback:(){
 
@@ -386,7 +309,9 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
                 gridDataRowList: gridHeaderList,
                 func: (i){
                   print("TAP ${data[i]}");
-                 // Navigator.push(context, MaterialPageRoute(builder: (context)=>AttenSatus()),);
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>AttendanceCardViewEmpDetails(
+                    details: data[i],
+                  )),);
                 },
               )
             ],

@@ -48,16 +48,70 @@ class LocationNotifier extends ChangeNotifier{
 
     //locationData=location.getLocation() as LocationData?;
     bool tempSErvice=await location.serviceEnabled();
-    print(tempSErvice);
-    print(isLocationServiceEnable);
+  //  print(tempSErvice);
+  //  print(isLocationServiceEnable);
     if(isLocationServiceEnable != tempSErvice){
       isLocationServiceEnable=tempSErvice;
       location.enableBackgroundMode(enable: true);
       location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
+      locationData=await location.getLocation();
+      final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
+      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      if(first!=null){
+        if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
+          dbRef2.update({
+            'lat':locationData!.latitude,
+            'long':locationData!.longitude,
+            'time':DateTime.now().toString()
+          });
+          first = addresses.first;
+        }
+      //  print(first.addressLine);
+      }
+      else{
+        dbRef2.update({
+          'lat':locationData!.latitude,
+          'long':locationData!.longitude,
+          'time':DateTime.now().toString()
+        });
+        first = addresses.first;
+      //  print(first.addressLine);
+      }
     }
     if(isLocationServiceEnable){
-      print("ENABLED");
-      locationData=await location.getLocation();
+      if(!await Location().isBackgroundModeEnabled()){
+        location.enableBackgroundMode(enable: true);
+      }
+
+      location.onLocationChanged.listen((event) async {
+        final coordinates = new Coordinates(event.latitude, event.longitude);
+        var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        if(first!=null){
+          if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
+            dbRef2.update({
+              'lat':event.latitude,
+              'long':event.longitude,
+              'time':DateTime.now().toString()
+            });
+            first = addresses.first;
+            locationData=event;
+          }
+          // print(first.addressLine);
+        }
+        else{
+          dbRef2.update({
+            'lat':event.latitude,
+            'long':event.longitude,
+            'time':DateTime.now().toString()
+          });
+          first = addresses.first;
+          locationData=event;
+         // print(first.addressLine);
+        }
+      });
+
+   //   print("ENABLED");
+/*      locationData=await location.getLocation();
       final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
       var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
      // print("56 --- ${addresses.first.addressLine}");
@@ -78,7 +132,7 @@ class LocationNotifier extends ChangeNotifier{
         });
           first = addresses.first;
         print(first.addressLine);
-      }
+      }*/
     }
     if(!tempSErvice && !isLocationServiceEnable){
       Timer(Duration(seconds: 10), (){

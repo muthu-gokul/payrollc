@@ -243,7 +243,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                  if(USERDETAIL['UserGroupId']==2){
                                                    FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
                                                      'lat':"null",
-                                                     'long':"null"
+                                                     'long':"null",
+                                                     'Name':USERDETAIL['Name']
                                                    });
                                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
                                                  }

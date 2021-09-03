@@ -116,7 +116,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
         menuSel==3?SiteEmployeeGrid(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):
-        menuSel==4?MapSample():
+        menuSel==4?MapSample(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
         menuSel==5?AttendanceOverView(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):Container(),

@@ -120,6 +120,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> {
 
   @override
   void initState() {
+    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
   //  _listenLocation();
     getCurrentDayInfo();
     super.initState();

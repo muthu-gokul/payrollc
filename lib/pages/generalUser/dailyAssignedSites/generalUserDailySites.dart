@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
+import 'package:cybertech/notifier/timeNotifier.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterAddNEw.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteAssignPage.dart';
 import 'package:cybertech/pages/generalUser/dailyAssignedSites/generalUserSiteLoginLogOut.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 
 class GeneralUserDailySites extends StatefulWidget {
   VoidCallback drawerCallback;
@@ -141,72 +143,74 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
               child: ListView.builder(
                 itemCount: siteList.length,
                 itemBuilder: (ctx,i){
-                  return GestureDetector(
-                    onTap: () async {
-                      print("${first.addressLine}");
-                    /*  var loc=await location.getLocation();
-                      final coordinates = new Coordinates(loc.latitude, loc.longitude);
-                      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-                      print("${addresses.first.addressLine}");
-                      print("await Location().isBackgroundModeEnabled() ${await Location().isBackgroundModeEnabled()}");
-                      print("await Location().requestService() ${await Location().requestService()}");
-                      print("await Location().serviceEnabled() ${await Location().serviceEnabled()}");*/
-                      if(_location!=null && await Location().isBackgroundModeEnabled()
-                          && await Location().requestService() && await Location().serviceEnabled()){
-                        print("HELLO IF");
-                        Navigator.push(context, MaterialPageRoute(builder: (ctx)=>GeneralUserSiteLoginLogOut(
-                          currentLocation: "${first.featureName} : ${first.addressLine}",
-                          index: i,
-                          latitude: _location!.latitude,
-                          longitude: _location!.longitude,
-                        )));
-                      }
-                      else{
-                        print("HELLO");
-                        var loc=await location.getLocation();
-                        setState((){
-                          _location=loc;
-                        });
+                  return Consumer<LocationNotifier>(
+                    builder: (context,locNot,child)=> GestureDetector(
+                      onTap: () async {
+                     //   print("${first.addressLine}");
+                      /*  var loc=await location.getLocation();
+                        final coordinates = new Coordinates(loc.latitude, loc.longitude);
+                        var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                        print("${addresses.first.addressLine}");*/
+                        print("await Location().isBackgroundModeEnabled() ${await Location().isBackgroundModeEnabled()}");
+                        print("await Location().requestService() ${await Location().requestService()}");
+                        print("await Location().serviceEnabled() ${await Location().serviceEnabled()}");
+                        if(locNot.locationData!=null ){
+                          print("HELLO IF");
+                          Navigator.push(context, MaterialPageRoute(builder: (ctx)=>GeneralUserSiteLoginLogOut(
+                            currentLocation: "${locNot.first.featureName} : ${locNot.first.addressLine}",
+                            index: i,
+                            latitude: locNot.locationData!.latitude,
+                            longitude: locNot.locationData!.longitude,
+                          )));
+                        }
+                        else{
+                          print("HELLO");
+                          locNot.listenLocation();
+                    /*      var loc=await location.getLocation();
+                          setState((){
+                            _location=loc;
+                          });
 
-                        _listenLocation();
-                      }
+                          _listenLocation();*/
+                        }
 
-                    },
-                    child: Container(
-                      height: 60,
-                      width: SizeConfig.screenWidth!*0.95,
-                      margin: EdgeInsets.only(bottom: 20,left: 20,right: 20),
-                      padding: EdgeInsets.only(left: 20,right: 20),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.15),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: Offset(1, 8), // changes position of shadow
-                            )
-                          ]
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Container(
-                              width: (SizeConfig.screenWidth!*0.95)-76,
-                              child: Text("${siteList[i]['SiteName']}",style: gridTextColor14,)
-                          ),
-                          siteList[i]['SiteLoginTime']==null?Container():Container(
-                            height: 8,
-                            width: 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color:siteList[i]['SiteLogoutTime']==null? Colors.red:Colors.green
+                      },
+                      child: Container(
+                        height: 60,
+                        width: SizeConfig.screenWidth!*0.95,
+                        margin: EdgeInsets.only(bottom: 20,left: 20,right: 20),
+                        padding: EdgeInsets.only(left: 20,right: 20),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.15),
+                                spreadRadius: 1,
+                                blurRadius: 5,
+                                offset: Offset(1, 8), // changes position of shadow
+                              )
+                            ]
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Container(
+                                width: (SizeConfig.screenWidth!*0.95)-76,
+                                child: Text("${siteList[i]['SiteName']}",style: gridTextColor14,)
                             ),
-                          )
-                        ],
+                            siteList[i]['SiteLoginTime']==null?Container():Container(
+                              height: 8,
+                              width: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:siteList[i]['SiteLogoutTime']==null? Colors.red:Colors.green
+                              ),
+                            )
+                          ],
+                        ),
+                        //child: Text("Thiruverkadu : No.134 Selva laxminagar 4 set, TTS Nagar, Thiruverkadu, Tamil Nadu 600077, India",style: gridTextColor14,),
                       ),
-                      //child: Text("Thiruverkadu : No.134 Selva laxminagar 4 set, TTS Nagar, Thiruverkadu, Tamil Nadu 600077, India",style: gridTextColor14,),
                     ),
                   );
                   return Text(siteList[i]['SiteName']);
