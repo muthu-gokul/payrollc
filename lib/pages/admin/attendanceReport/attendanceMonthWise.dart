@@ -27,8 +27,8 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
   late  double width,height,width2;
   List<DateTime> picked=[];
   DateTime? selectedDate;
-  final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
-  final dbRef2 = FirebaseDatabase.instance.reference().child("Users");
+
+
 
   List<AttendanceMonthGridStyleModel> gridHeaderList=[
     AttendanceMonthGridStyleModel(columnName: "Name"),
@@ -57,7 +57,7 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
   List<dynamic> users=[];
   @override
   void initState() {
-    dbRef2.orderByChild('UserGroupId').equalTo(2).once().then((value){
+    usersRef.orderByChild('UserGroupId').equalTo(2).once().then((value){
       users.clear();
       if(value.value!=null){
         log("USESRS ${value.value}");
@@ -76,7 +76,7 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
   }
 
   getUsers(DateTime date){
-    dbRef2.orderByChild('UserGroupId').equalTo(2).once().then((value){
+    usersRef.orderByChild('UserGroupId').equalTo(2).once().then((value){
       users.clear();
       if(value.value!=null){
         log("USESRS ${value.value}");
@@ -125,7 +125,7 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
 
       print(DateFormat(dbDateFormat).format(picked[0]));
       print(DateFormat(dbDateFormat).format(picked[1]));
-      dbRef.orderByKey()
+      attendanceRef.orderByKey()
           .startAt("${DateFormat(dbDateFormat).format(picked[0])}")
           .endAt("${DateFormat(dbDateFormat).format(picked[1])}")
           .once().then((value){

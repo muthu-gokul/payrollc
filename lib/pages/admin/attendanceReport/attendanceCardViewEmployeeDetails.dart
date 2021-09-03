@@ -28,8 +28,8 @@ class _AttendanceCardViewEmpDetailsState extends State<AttendanceCardViewEmpDeta
 
   late  double width,height,width2;
 
-  final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
-  final dbRef2 = FirebaseDatabase.instance.reference().child("Users");
+
+
 
   int selIndex=-1;
   @override

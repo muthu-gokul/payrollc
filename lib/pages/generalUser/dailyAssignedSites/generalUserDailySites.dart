@@ -112,7 +112,8 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
       if(value.snapshot.value!=null){
         List<dynamic> tempList=value.snapshot.value[USERDETAIL['Uid']];
         setState(() {
-          siteList=tempList.where((element) => element['IsAdd']==true).toList();
+          siteList=tempList;
+        //s  siteList=tempList.where((element) => element['IsAdd']==true).toList();
         });
 
       }
@@ -176,7 +177,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
                 itemCount: siteList.length,
                 itemBuilder: (ctx,i){
                   return Consumer<LocationNotifier>(
-                    builder: (context,locNot,child)=> GestureDetector(
+                    builder: (context,locNot,child)=>!siteList[i]['IsAdd']?Container(): GestureDetector(
                       onTap: () async {
                      //   print("${first.addressLine}");
                       /*  var loc=await location.getLocation();

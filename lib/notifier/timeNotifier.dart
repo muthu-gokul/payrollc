@@ -7,14 +7,23 @@ import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as permi;
+import 'package:permission_handler/permission_handler.dart';
 
 class TimeNotifier extends ChangeNotifier{
 
 
   var timeInfo;
-
-  batteryInfo()  {
+  bool locAlways=true;
+  batteryInfo()  async {
     timeInfo =DateFormat.jm().format(DateTime.parse(DateTime.now().toString()));
+   // var status2 = await Permission.locationAlways.status;
+   /* if(status2.isDenied || status2.isRestricted){
+      locAlways=false;
+    }
+    else if(status2.isGranted){
+      locAlways=true;
+    }
+*/
     notifyListeners();
   }
 

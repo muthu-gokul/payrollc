@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cybertech/pages/admin/adminHomePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cybertech/constants/constants.dart';
@@ -10,11 +11,14 @@ import 'package:location/location.dart';
 import 'package:location_permissions/location_permissions.dart' as locPer;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api/authentication.dart';
 import 'constants/size.dart';
+import 'notifier/timeNotifier.dart';
 import 'pages/generalUser/generalUserHomePage.dart';
 import 'widgets/alertDialog.dart';
+import 'widgets/loader.dart';
 
 
 
@@ -53,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late SharedPreferences _Loginprefs;
   static const String useremail = 'email';
   static const String passwordd = 'password';
-  final dbRef = FirebaseDatabase.instance.reference().child("Users");
+
   AuthenticationHelper authenticationHelper=new AuthenticationHelper();
 
   void _loadCredentials() {
@@ -120,10 +124,30 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     });
   }
+  bool locAlways=false;
+   locationDialog(BuildContext context){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => CupertinoAlertDialog(
+          content: Text("Allow CyberTech to Access Device's Location All Time",style: TextStyle(fontSize: 18),),
+          actions: [
+            CupertinoDialogAction(
+              child: Text("Open App Info"),
+              onPressed: (){
+                Navigator.pop(context);
+                locPer.LocationPermissions().openAppSettings().then((bool hasOpened) =>
+                    debugPrint('App Settings opened: ' + hasOpened.toString()));
+              },
+            ),
+          ],
+        )
+    );
+  }
   allowAccess() async{
     var status = await Permission.storage.status;
     var status2 = await Permission.locationAlways.status;
-    var status3 = await Permission.locationWhenInUse.status;
+   // var status3 = await Permission.locationWhenInUse.status;
     if (!status.isGranted) {
       await Permission.storage.request();
     }
@@ -132,16 +156,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     print("status2.isDenied ${status2.isDenied}");
     print("status2.isRestricted ${status2.isRestricted}");
 
-    if(status2.isDenied){
+    if(status2.isDenied || status2.isRestricted){
      // LocationPermissionLevel.locationAlways()
-      final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
-          .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);
+      locationDialog(context);
+    //  final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
+     //     .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);
 
      // setState(() {
-        print("permissionRequestResult ${permissionRequestResult}");
+     //   print("permissionRequestResult ${permissionRequestResult}");
      // });
     }
-/*     if(!status2.isGranted){
+      /*     if(!status2.isGranted){
        await Permission.locationAlways.request();
     }
      else if(status2.isDenied){
@@ -163,6 +188,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     // }
 
   }
+
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? verificationId;
@@ -205,6 +231,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       },
                     ),*/
                     SizedBox(height: _height * 0.15,),
+
                 //    SvgPicture.asset("assets/images/qms.svg",height: 100,),
                     SizedBox(height: 20,),
                     Form(
@@ -226,35 +253,56 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                              .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);*/
                                          //requestPermission(locPer.LocationPermissionLevel.locationAlways);
                                          if(_loginFormKey.currentState!.validate() && !isEmailInvalid && !ispasswordInvalid){
-                                           AuthenticationHelper()
-                                               .signIn(email1: username.text, password1: password.text)
-                                               .then((result) {
-                                             if (result == null) {
-                                               print("UIS ${AuthenticationHelper().user}");
-                                               _setCredentials(username.text, password.text);
-                                               dbRef.child(AuthenticationHelper().user.uid).once().then((value){
-                                                 print(value.value);
-                                                 setState(() {
-                                                   USERDETAIL=value.value;
-                                                 });
-                                                 if(USERDETAIL['UserGroupId']==1){
-                                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
-                                                 }
-                                                 if(USERDETAIL['UserGroupId']==2){
-                                                   FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
-                                                     'lat':"null",
-                                                     'long':"null",
-                                                     'Name':USERDETAIL['Name']
+                                           var status2 = await Permission.locationAlways.status;
+                                           if(status2.isDenied || status2.isRestricted){
+                                             locationDialog(context);
+                                           }
+                                           else{
+                                             setState(() {
+                                               isLoading=true;
+                                             });
+                                             AuthenticationHelper()
+                                                 .signIn(email1: username.text, password1: password.text)
+                                                 .then((result) {
+                                               if (result == null) {
+                                                 print("UIS ${AuthenticationHelper().user}");
+                                                 _setCredentials(username.text, password.text);
+                                                 usersRef.child(AuthenticationHelper().user.uid).once().then((value){
+                                                   print(value.value);
+                                                   setState(() {
+                                                     USERDETAIL=value.value;
                                                    });
-                                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
-                                                 }
-                                               });
+                                                   if(USERDETAIL['UserGroupId']==1){
+                                                     setState(() {
+                                                       isLoading=false;
+                                                     });
+                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                                   }
+                                                   if(USERDETAIL['UserGroupId']==2){
+                                                     FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
+                                                       'lat':"null",
+                                                       'long':"null",
+                                                       'Name':USERDETAIL['Name']
+                                                     });
+                                                     setState(() {
+                                                       isLoading=false;
+                                                     });
+                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
+                                                   }
+                                                 });
 
 
-                                             } else {
-                                               CustomAlert().showMessage(result,context);
-                                             }
-                                           });
+                                               }
+                                               else {
+                                                 setState(() {
+                                                   isLoading=false;
+                                                 });
+                                                 CustomAlert().showMessage(result,context);
+                                               }
+                                             });
+                                           }
+
+
                                          }
                                           },
                                       child: Container(
@@ -486,17 +534,25 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
               ),
             ),
+            Loader(
+              isLoad: isLoading,
+            )
 
-            isLoading?Container(
-              height: _height,
-              width: _width,
-              color: Colors.black.withOpacity(0.5),
-              child: Center(
-                child: Container(
-                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(yellowColor),),
-                ),
-              ),
-            ):Container(width: 0,height: 0,)
+    /*        Consumer<TimeNotifier>(
+              builder: (context,timeNotifier,child){
+               if(timeNotifier.locAlways!=locAlways){
+                 WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+                   setState(() {
+                     locAlways=timeNotifier.locAlways;
+                   });
+                 });
+
+                 print("TRUE");
+               }
+                return Container();
+              }
+            ),
+            !locAlways?locationDialog(context):Container()*/
           ],
         ),
       ),

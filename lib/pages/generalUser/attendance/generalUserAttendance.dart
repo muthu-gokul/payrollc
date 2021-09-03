@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/notifier/timeNotifier.dart';
+import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -331,19 +332,27 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                       currentDayInfo['LogoutTime']==null?Consumer<LocationNotifier>(
                         builder: (context,locNot,child)=> GestureDetector(
                           onTap: () async {
-                            // _location=await location.getLocation();
-                            // final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
-                            // var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-                            // var first = addresses.first;
-                            // print("${first.featureName} : ${first.addressLine}");
-                            if(locNot.isLocationServiceEnable && locNot.locationData!=null && locNot.first!=null){
-                              dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).update({
-                                'lat':locNot.locationData!.latitude,
-                                'longi':locNot.locationData!.longitude,
-                                'LogoutTime':DateTime.now().toString(),
-                                'LogoutAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
-                              });
-                            }
+
+                            CustomAlert(
+                              callback: (){
+                                    if(locNot.isLocationServiceEnable && locNot.locationData!=null && locNot.first!=null){
+                                      dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).update({
+                                        'lat':locNot.locationData!.latitude,
+                                        'longi':locNot.locationData!.longitude,
+                                        'LogoutTime':DateTime.now().toString(),
+                                        'LogoutAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
+                                      });
+                                      Navigator.pop(context);
+                                    }
+                                    else{
+                                      locNot.listenLocation();
+                                      Navigator.pop(context);
+                                    }
+
+                              }
+                            ).cupertinoDialog1(context);
+
+
 
 
 

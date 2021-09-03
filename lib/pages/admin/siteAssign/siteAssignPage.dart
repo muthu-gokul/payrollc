@@ -47,7 +47,7 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
   int? userGroupId=null;
   String? userGroupName=null;
 
-  final databaseReference = FirebaseDatabase.instance.reference();
+
 
 
 

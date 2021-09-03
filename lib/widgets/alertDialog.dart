@@ -1,6 +1,7 @@
 
 import 'dart:io';
 import 'package:cybertech/constants/size.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 
@@ -445,6 +446,30 @@ class CustomAlert{
     });
   }
 
+
+  void cupertinoDialog1(BuildContext context){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => CupertinoAlertDialog(
+            content: Text("Are you sure want to Logout ?",style: TextStyle(fontSize: 18),),
+            actions: [
+              CupertinoDialogAction(
+                  child: Text("Yes"),
+                  onPressed: (){
+                    callback!();
+                  },
+              ),
+              CupertinoDialogAction(
+                  child: Text("No"),
+                  onPressed: (){
+                    Navigator.pop(ctx);
+                  },
+              ),
+            ],
+        )
+    );
+  }
 }
 
 

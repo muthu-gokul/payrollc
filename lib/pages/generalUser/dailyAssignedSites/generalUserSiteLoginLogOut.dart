@@ -124,8 +124,9 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               },
                               iconColor: Colors.white,
                             ),
-                            Text("Login",
+                            Text("${siteDetails['SiteName']}",
                               style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -240,27 +241,9 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                   //LogOut
                   Stack(
                     children: [
-                      Container(
-                        height: 50,
-                        width:SizeConfig.screenWidth,
-                        color: yellowColor,
-                        child: Row(
-                          children: [
-                            ArrowBack(
 
-                              ontap: (){
-                                Navigator.pop(context);
-                              },
-                              iconColor: Colors.white,
-                            ),
-                            Text("LogOut",
-                              style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
                       Container(
-                        margin: EdgeInsets.only(top: 45),
+                        margin: EdgeInsets.only(top: 50),
                         height: SizeConfig.screenHeight!-100,
                         width: SizeConfig.screenWidth,
                         child: ListView(
@@ -323,6 +306,17 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             SizedBox(height: 20,),
                             siteDetails['SiteLogoutTime']==null?Container():
                             Text("Logged Out at ${siteDetails['SiteLogoutTime']}"),
+                          //  SizedBox(height: 20,),
+                            AddNewLabelTextField(
+                              textEditingController: remarks,
+                              maxlines: null,
+                              onChange: (v){},
+                              labelText: "Remarks",
+                              onEditComplete: (){
+                                node.unfocus();
+                              },
+                              scrollPadding: 1000,
+                            ),
                             SizedBox(height: 20,),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,21 +362,41 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               ),
                             ),
 
-                            AddNewLabelTextField(
-                              textEditingController: remarks,
-                              maxlines: null,
-                              onChange: (v){},
-                              labelText: "Remarks",
-                              onEditComplete: (){
-                                node.unfocus();
-                              },
-                              scrollPadding: 1000,
-                            ),
-                            SizedBox(height: 300,)
+
+
                           ],
                         ),
                       ),
+                      Container(
+                        height: 50,
+                        width:SizeConfig.screenWidth,
 
+                        decoration: BoxDecoration(
+                            color: yellowColor,
+                         /*   boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.3),
+                                spreadRadius: 5,
+                                blurRadius: 5,
+                                offset: Offset(1, 8), // changes position of shadow
+                              )
+                            ]*/
+                        ),
+                        child: Row(
+                          children: [
+                            ArrowBack(
+
+                              ontap: (){
+                                Navigator.pop(context);
+                              },
+                              iconColor: Colors.white,
+                            ),
+                            Text("LogOut",
+                              style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ],

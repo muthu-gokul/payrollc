@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -145,6 +146,16 @@ class MapSampleState extends State<MapSample> {
                                     if(value.value!=null){
                                       print(value.value);
                                       showBottomModel(value.value);
+                                    }
+                                    else{
+                                      showDialog(
+                                          context: context,
+                                          builder: (ctx) => CupertinoAlertDialog(
+                                            title: Icon(Icons.error_outline,color: Colors.red,size: 50,),
+                                            content: Text("Not Yet Logged In",
+                                              style: TextStyle(fontSize: 18),),
+                                          )
+                                      );
                                     }
                                   });
 

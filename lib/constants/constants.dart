@@ -1,4 +1,5 @@
- import 'package:flutter/material.dart';
+ import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 
 Color yellowColor=Color(0xFF158BCC);
 Color bgColor=Color(0xFF4267F6);
@@ -32,3 +33,12 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
 
  Color attendanceMonthGridBodyBgColor=Color(0xFFF6F7F9);
  String dbDateFormat="yyyy-MM-dd";
+
+
+
+
+ final databaseReference = FirebaseDatabase.instance.reference();
+
+ final usersRef = FirebaseDatabase.instance.reference().child("Users");
+ final attendanceRef = FirebaseDatabase.instance.reference().child("Attendance");
+
