@@ -191,11 +191,10 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                       },
                     ),
                     Container(
-                      child: Text('Attendance',style: TextStyle(color: Color(0xffffffff),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
+                      child: Text('   Attendance    ',style: TextStyle(color: Color(0xffffffff),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
                     ),
                     Consumer<LocationNotifier>(
-                        builder: (context,locNot,child)=> !locNot.isLocationServiceEnable?Icon(Icons.location_off_outlined,color: Colors.red,):
-                        Icon(Icons.location_on_outlined,color: Colors.red,)
+                        builder: (context,locNot,child)=> Container()
                     )
                   ],
                 ),
@@ -281,7 +280,11 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
 
                         CachedNetworkImage(
                           imageUrl: USERDETAIL['imgUrl'],
-                          placeholder: (context,url) => CircularProgressIndicator(),
+                          placeholder: (context,url) => CupertinoActivityIndicator(
+                            radius: 20,
+                            animating: true,
+
+                          ),
                           errorWidget: (context,url,error) => new Icon(Icons.error),
                         ),
 

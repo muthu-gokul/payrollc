@@ -470,6 +470,17 @@ class CustomAlert{
         )
     );
   }
+
+  void cupertinoAlertDialog(BuildContext context,String title){
+    showDialog(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: Icon(Icons.error_outline,color: Colors.red,size: 50,),
+          content: Text("$title",
+            style: TextStyle(fontSize: 18),),
+        )
+    );
+  }
 }
 
 

@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cybertech/constants/constants.dart';
+import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -67,7 +70,10 @@ class MapSampleState extends State<MapSample> {
     print(geoposition.longitude);
   }
 
-  showBottomModel(Map details){
+  showBottomModel(Map details,double lat,double long) async {
+    final coordinates = new Coordinates(lat, long);
+    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+
     showModalBottomSheet(
         enableDrag: false,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -78,38 +84,23 @@ class MapSampleState extends State<MapSample> {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Container(
-                height: 70,
-                width: double.maxFinite,
-                margin: EdgeInsets.fromLTRB(10, 20, 10, 20),
-                child: Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("White Eritiga",style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
-                        SizedBox(height: 3,),
-                        Text("HRA5G",style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
-                        SizedBox(height: 3,),
-                        Text("4999",style: TextStyle(fontFamily: 'RB',fontSize: 22,color: Color(0xFF444444)),),
-                      ],
-                    ),
-                    Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text("${details['Name']}",style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
-                        SizedBox(height: 3,),
-                        Text("4.7",style: TextStyle(fontFamily: 'RB',fontSize: 22,color: Color(0xFF444444)),),
-                        SizedBox(height: 3,),
-                        Text("9788149293",style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
-
-                        // Text("4999",style: TextStyle(fontFamily: 'RB',fontSize: 22,color: Color(0xFF444444)),),
-                      ],
-                    ),
-                  ],
-                ),
-              )
+              SizedBox(height: 10,),
+              SvgPicture.asset("assets/svg/map-img.svg",height: 70,),
+              SizedBox(height: 15,),
+              Text("${details['Name']}",style: TextStyle(fontFamily: 'RB',fontSize: 22,color: Color(0xFF444444)),),
+              SizedBox(height: 7,),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.location_on_outlined,color: Colors.red,),
+                  Container(
+                    width: SizeConfig.screenWidth!*0.8,
+                    child: Text("${addresses.first.addressLine}"
+                      ,style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20,),
             ],
           );
         });
@@ -145,7 +136,7 @@ class MapSampleState extends State<MapSample> {
                                   dbRef.child(DateFormat(dbDateFormat).format(DateTime.now())).child(k).once().then((value){
                                     if(value.value!=null){
                                       print(value.value);
-                                      showBottomModel(value.value);
+                                      showBottomModel(value.value,v['lat'], v['long']);
                                     }
                                     else{
                                       showDialog(

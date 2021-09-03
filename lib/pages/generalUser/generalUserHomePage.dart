@@ -105,6 +105,7 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
 
               DrawerContent(
                   title: "Attendance",
+                  img: 'assets/images/nav/calendar.png',
                   ontap: (){
                     setState(() {
                       menuSel=1;
@@ -114,6 +115,7 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
               ),
               DrawerContent(
                   title: "Assigned Sites",
+                  img: 'assets/images/nav/destination.png',
                   ontap: (){
                     setState(() {
                       menuSel=2;
@@ -150,6 +152,7 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
               ),*/
               DrawerContent(
                   title: "Logout",
+                  img: 'assets/images/nav/logout.png',
                   ontap: (){
                     //  setState(() {
                     //   menuSel=2;
@@ -187,7 +190,8 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
 class DrawerContent extends StatelessWidget {
   VoidCallback ontap;
   String title;
-  DrawerContent({required this.title,required this.ontap});
+  String img;
+  DrawerContent({required this.title,required this.ontap,required this.img});
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +205,12 @@ class DrawerContent extends StatelessWidget {
         ),
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.only(left: 10),
-        child: Text("$title",style: TextStyle(fontFamily: 'RR',color: Color(0xFF444444),fontSize: 16),),
+        child: Row(
+          children: [
+            Image.asset(img,height: 25,),
+            Text("    $title",style: TextStyle(fontFamily: 'RR',color: Color(0xFF444444),fontSize: 16),),
+          ],
+        ),
       ),
     );
   }

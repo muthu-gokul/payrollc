@@ -199,7 +199,7 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                               });
                             }
                             else{
-                              CustomAlert().commonErrorAlert2(context, "Logged In", "User has Logged in Site. You cant change");
+                              CustomAlert().cupertinoAlertDialog(context, "User has Logged in Site. You cant change");
                             }
 
                           },

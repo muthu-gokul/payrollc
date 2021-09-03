@@ -137,99 +137,85 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         width: SizeConfig.screenWidth,
                         child: ListView(
                           children: [
+                            SizedBox(height: 100,),
+                            Align(
+                              alignment:Alignment.center,
+                              child: Container(
+                                height: 150,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.15),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: Offset(1, 8), // changes position of shadow
+                                      )
+                                    ]
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+
+                                    Text( siteDetails['SiteLoginTime']==null?"${DateFormat.jm().format(DateTime.now())}":
+                                    "${DateFormat.jm().format(DateTime.parse(siteDetails['SiteLoginTime']))}",
+                                    style: TextStyle(fontFamily: 'RB',fontSize: 20,color: Color(0xFF444444)),
+                                    ),
+                                    SizedBox(height: 7,),
+                                    Text("${DateFormat.MMMMd().format(DateTime.now())}",
+                                      style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Color(0xFF444444)),
+
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      height: 35,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: bgColor,
+
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(siteDetails['SiteLoginTime']==null?"Log In":"Logged In",
+                                          style: TextStyle(fontSize: 14,color: Colors.white,fontFamily: 'RM'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 20,),
+
                             Container(
-                              margin: EdgeInsets.only(left: SizeConfig.width20!,right: SizeConfig.width20!,top: 20),
+                              margin: EdgeInsets.all(20),
+                              padding: EdgeInsets.fromLTRB(5, 10, 5, 10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.15),
+                                      spreadRadius: 1,
+                                      blurRadius: 5,
+                                      offset: Offset(1, 8), // changes position of shadow
+                                    )
+                                  ]
+                              ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  GestureDetector(
-                                    onTap:() async{
-                                      /*  final DateTime picked = await showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(), // Refer step 1
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2100),
-                                            );
-                                            if (picked != null)
-                                              setState(() {
-                                               ean.selectedDate=picked;
-                                              });*/
-                                    },
-                                    child: Container(
-                                      height: 50,
-                                      width:( SizeConfig.screenWidthM40!*0.5)-10,
-                                      padding: EdgeInsets.only(left: 10,right: 10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(3),
-                                          border: Border.all(color: addNewTextFieldBorder)
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Text("${DateFormat("dd-MM-yyyy").format(DateTime.now())}"),
-                                          Spacer(),
-                                          SvgPicture.asset("assets/svg/calender.svg",height: 25,width: 25,color: Colors.black ,)
-
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      /* final TimeOfDay picked = await showTimePicker(
-                                              context: context,
-                                              initialTime: ean.selectedTime==null?TimeOfDay.now():ean.selectedTime,
-
-                                            );
-                                            if (picked != null){
-                                              print(picked);
-                                            }
-                                              setState(() {
-                                                ean.selectedTime=picked;
-                                                ean.time = formatDate(
-                                                    DateTime(2019, 08, 1, ean.selectedTime.hour, ean.selectedTime.minute),
-                                                    [hh, ':', nn, " ", am]).toString();
-                                              });*/
-                                    },
-                                    child:Container(
-                                      height: 50,
-                                      width:( SizeConfig.screenWidthM40!*0.5)-10,
-                                      padding: EdgeInsets.only(left: 10,right: 10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(3),
-                                          border: Border.all(color: addNewTextFieldBorder)
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Consumer<TimeNotifier>(
-                                            builder: (context,timeNotifier,child)=> Text('${timeNotifier.timeInfo??"${DateFormat.jm().format(DateTime.parse(DateTime.now().toString()))}"}',
-
-                                            ),
-                                          ),
-
-                                          Spacer(),
-                                          Icon(Icons.timer)
-
-                                        ],
-                                      ),
-                                    ),
+                                  Icon(Icons.location_on_outlined,color: Colors.red,size: 25,),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                      width: SizeConfig.screenWidth!*0.75,
+                                      child: Text(siteDetails['SiteLoginAddress']==null?"${widget.currentLocation}":"${siteDetails['SiteLoginAddress']}",
+                                        style: gridTextColor14,)
                                   ),
                                 ],
                               ),
-                            ),
-                            SizedBox(height: 20,),
-                            siteDetails['SiteLoginTime']==null?Container():
-                                Text("Logged in at ${siteDetails['SiteLoginTime']}"),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(Icons.location_on_outlined,color: Colors.red,size: 25,),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                    width: SizeConfig.screenWidth!*0.9,
-                                    child: Text(siteDetails['SiteLoginAddress']==null?"${widget.currentLocation}":"${siteDetails['SiteLoginAddress']}",
-                                      style: gridTextColor14,)
-                                ),
-                              ],
                             )
                           ],
                         ),
@@ -248,6 +234,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         width: SizeConfig.screenWidth,
                         child: ListView(
                           children: [
+
                             Container(
                               margin: EdgeInsets.only(left: SizeConfig.width20!,right: SizeConfig.width20!,top: 20),
                               child: Row(
@@ -479,7 +466,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                                             pageController!.animateToPage(1, duration: Duration(milliseconds: 300), curve: Curves.easeIn);
                                           }
                                           else{
-                                            CustomAlert().commonErrorAlert2(context, "Login", "");
+                                            CustomAlert().cupertinoAlertDialog(context, "Login");
                                           }
 
                                         },
@@ -533,7 +520,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         });
                       }
                       else{
-                        CustomAlert().commonErrorAlert2(context, "Already Logged In...", "");
+                        CustomAlert().cupertinoAlertDialog(context, "Already Logged In...", );
                       }
                     }
                     else{
@@ -580,7 +567,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         }
                       }
                       else{
-                        CustomAlert().commonErrorAlert2(context, "Already Logged Out...", "");
+                        CustomAlert().cupertinoAlertDialog(context, "Already Logged Out...");
                       }
 
                     }

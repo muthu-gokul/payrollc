@@ -21,10 +21,10 @@ class AddButton extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 25),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: yellowColor,
+          color: bgColor,
           boxShadow: [
             BoxShadow(
-              color: yellowColor.withOpacity(0.4),
+              color: bgColor.withOpacity(0.4),
               spreadRadius: 1,
               blurRadius: 5,
               offset: Offset(1, 8), // changes position of shadow

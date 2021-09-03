@@ -230,10 +230,15 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                       pinned: true,
                       flexibleSpace: FlexibleSpaceBar(
                           background: Container(
-                            color:bgColor,
-                            width: SizeConfig.screenWidth,
-                            margin:EdgeInsets.only(top: 55),
 
+                            width: SizeConfig.screenWidth,
+                           // margin:EdgeInsets.only(top: 55),
+                            decoration: BoxDecoration(
+                                color:bgColor,
+                              image: DecorationImage(
+                                image: AssetImage("assets/images/addEmployeeHeader.png")
+                              )
+                            ),
                           )
                       ),
                     ),
@@ -251,6 +256,32 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                   ),
                   child: ListView(
                     children: [
+                      SizedBox(height: 20,),
+                      GestureDetector(
+                        onTap: (){
+                          pickImage();
+                        },
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: uploadColor,width: 2)
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child:widget.isEdit && editUrl!=null?Image.network(editUrl!):
+                          _imageFile!=null? Image.file(_imageFile!,fit: BoxFit.contain,
+
+                          ):
+                          Center(child: SvgPicture.asset("assets/svg/upload.svg",height: 30,width: 30,)),
+                        ),
+                      ),
+                      SizedBox(height: 5,),
+                      Align(
+                          alignment: Alignment.center,
+                          child: Text("Upload Image",style: gridTextColor14,)
+                      ),
+                      SizedBox(height: 20,),
                       AddNewLabelTextField(
                         ontap: (){},
                         labelText: 'Name',
@@ -316,26 +347,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                       ),
                       !userGroup?Container():ValidationErrorText(),
 
-                      GestureDetector(
-                        onTap: (){
-                          pickImage();
-                        },
-                        child: Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: uploadColor,width: 2)
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child:widget.isEdit && editUrl!=null?Image.network(editUrl!):
-                          _imageFile!=null? Image.file(_imageFile!,fit: BoxFit.contain,
 
-                          ):
-                          Center(child: SvgPicture.asset("assets/svg/upload.svg",height: 30,width: 30,)),
-                        ),
-                      ),
-                      SizedBox(height: 20,),
 
                       GestureDetector(
                         onTap: (){
@@ -435,12 +447,17 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
 
 
                         },
-                        child: Container(
-                          height: 50,
-                          width: 120,
-                          child: Center(
-                            child: Text("Save"),
+                        child:    Container(
+                          height: 60,
+                          margin: EdgeInsets.only(left: 20,right: 20,top: 30),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            // boxShadow: [
+                            //   BoxShadow(color: Colors.green, spreadRadius: 3),
+                            // ],
+                            color: Colors.indigoAccent,
                           ),
+                          child:Center(child: Text('Done',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                         ),
                       )
                     ],

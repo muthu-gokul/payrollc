@@ -1,5 +1,6 @@
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
@@ -15,7 +16,12 @@ class Loader extends StatelessWidget {
       width: isLoad? SizeConfig.screenWidth:0,
       color: Colors.black.withOpacity(0.5),
       child: Center(
-        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(yellowColor),),
+        child:isLoad? CupertinoActivityIndicator(
+          radius: 30,
+          animating: true,
+
+        ):Container()
+       // child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(yellowColor),),
       ),
     );
   }

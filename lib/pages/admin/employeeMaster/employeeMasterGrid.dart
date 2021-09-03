@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
@@ -9,6 +10,7 @@ import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeMasterGrid extends StatefulWidget {
@@ -25,6 +27,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
   int selectedIndex=-1;
   String selectedUid="";
   dynamic selectedValue={};
+  Map employees={};
   bool showEdit=false;
   List<ReportGridStyleModel2> reportsGridColumnNameList=[
     ReportGridStyleModel2(columnName: "Name"),
@@ -37,17 +40,22 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
   @override
   void initState() {
     dbRef.onValue.listen((event) {
-      lists.clear();
-
+   //   lists.clear();
+      employees.clear();
       DataSnapshot dataValues = event.snapshot;
-      Map<dynamic, dynamic> values = dataValues.value;
-      print("LIST CLESR $values");
-      values.forEach((key, values) {
+      if(dataValues.value!=null){
+        Map<dynamic, dynamic> values = dataValues.value;
+        print("LIST CLESR $values");
+        setState(() {
+          employees=values;
+        });
+      }
+
+     /* values.forEach((key, values) {
         setState(() {
           lists.add(values);
         });
-
-      });
+      });*/
 
     });
     super.initState();
@@ -77,72 +85,61 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                 ],
               ),
             ),
-            /*StreamBuilder(
-                stream: dbRef.onValue,
-                builder: (context, AsyncSnapshot<Event> snapshot) {
-                  if (snapshot.hasData) {
-                    lists.clear();
+            Container(
+              margin: EdgeInsets.only(top: 60),
+              height: SizeConfig.screenHeight!-242,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Wrap(
+                  spacing: 20,
+                  runSpacing: 20,
+                  runAlignment: WrapAlignment.center,
+                  children: employees.map((key, value) => MapEntry(key, GestureDetector(
+                    child:    Container(
+                      width: SizeConfig.screenWidth!*0.47,
+                      height: 120,
+                      color: Colors.transparent,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 60,
+                            width: 60,
+                            clipBehavior: Clip.antiAlias,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
 
-                    DataSnapshot dataValues = snapshot.data!.snapshot;
-                    Map<dynamic, dynamic> values = dataValues.value;
-                    print("LIST CLESR $values");
-                    values.forEach((key, values) {
-                      lists.add(values);
-                    });
-
-                   */
-            /* Map<dynamic, dynamic> values = snapshot.data!.value;
-                    values.forEach((key, values) {
-                      lists.add(values);
-                    });*/
-            /*
-                    return ReportDataTable2(
-                      topMargin: 50,
-                      gridBodyReduceHeight: 140,
-                      selectedIndex: selectedIndex,
-                      gridData: lists,
-                      gridDataRowList: reportsGridColumnNameList,
-                      func: (index){
-                         if(selectedIndex==index){
-                            setState(() {
-                              selectedIndex=-1;
-                              showEdit=false;
-                            });
-
-                          }
-                          else{
-                            setState(() {
-                              selectedIndex=index;
-                              showEdit=true;
-                            });
-                          }
-                      },
-                    );
-                   */
-            /* return new ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: lists.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text("Name: " + lists[index]["Name"]),
-                                Text("Age: "+ lists[index]["Email"]),
-                                Text("Type: " +lists[index]["UserGroupName"]),
-                              ],
                             ),
-                          );
-                        });*/
-            /*
-                  }
-                  return Container(
-                    height: SizeConfig.screenHeight,
-                      width: SizeConfig.screenWidth,
-                      child: Center(child: CircularProgressIndicator())
-                  );
-                }),*/
-            ReportDataTable2(
+                            child:value['imgUrl']==null? Image.asset("assets/images/profile.png" ,width: 200,fit: BoxFit.cover,):
+
+                            CachedNetworkImage(
+                              imageUrl: value['imgUrl'],
+                              placeholder: (context,url) => CupertinoActivityIndicator(
+                                radius: 20,
+                                animating: true,
+                              ),
+                              errorWidget: (context,url,error) => new Icon(Icons.error),
+                            ),
+                          ) ,
+
+                          SizedBox(height: 5,),
+                          Container(
+                            child: Text('${value['Name']}',style: TextStyle(fontSize: 14,fontFamily: 'RB',color: Colors.black),),
+                          ),
+                          SizedBox(height: 2,),
+                          Container(
+                            child: Text('${value['UserGroupName']}',style: TextStyle(fontSize: 12,fontFamily: 'RR',color: Colors.black),),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))).values.toList()
+
+                ),
+              ),
+            ),
+            /*ReportDataTable2(
               topMargin: 55,
               gridBodyReduceHeight: 150,
               selectedIndex: selectedIndex,
@@ -168,7 +165,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                   });
                 }
               },
-            ),
+            ),*/
 
 
             //bottomNav

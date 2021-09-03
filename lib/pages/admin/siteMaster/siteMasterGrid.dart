@@ -131,13 +131,13 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                           height: 50,
                           width: 70,
                           alignment: Alignment.center,
-                          child: Text("${i+1}",style: gridHeaderTS,),
+                          child: Text("${i+1}",style: gridTextColor14,),
                         ),
                         Container(
                           height: 50,
                           width: SizeConfig.screenWidth!-82,
                           alignment: Alignment.centerLeft,
-                          child: Text("${lists[i]['SiteName']}",style: gridHeaderTS,),
+                          child: Text("${lists[i]['SiteName']}",style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 15),),
                         )
                       ],
                     ),
@@ -259,7 +259,7 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                   duration: Duration(milliseconds: 300),
                   curve: Curves.easeIn,
                   width: SizeConfig.screenWidth,
-                  height: 250,
+                  height: 300,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.white,
@@ -269,13 +269,15 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                   transform: Matrix4.translationValues(addSiteOpen?0:SizeConfig.screenWidth!, 0, 0),
 
                   child:Container(
-                    height:250,
+                    height:300,
                     width: SizeConfig.screenWidth,
                     color: Colors.white,
                     //  padding: EdgeInsets.only(left: SizeConfig.width20,right: SizeConfig.width20,bottom: SizeConfig.height10),
                     child:Column (
                         children: [
-                          SizedBox(height: 40,),
+                          SizedBox(height: 20,),
+                          Image.asset("assets/images/nav/building.png",height: 70,),
+                          SizedBox(height: 20,),
                           Container(
                             height: 50,
                             child: Stack(

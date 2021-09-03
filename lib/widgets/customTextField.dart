@@ -57,7 +57,7 @@ class AddNewLabelTextField extends StatelessWidget {
               borderSide: BorderSide(color: addNewTextFieldBorder)
           ),
           focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color:addNewTextFieldFocusBorder)
+              borderSide: BorderSide(color:bgColor)
           ),
           labelText: labelText,
            contentPadding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),

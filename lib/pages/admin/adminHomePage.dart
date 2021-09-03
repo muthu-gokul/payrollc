@@ -5,6 +5,7 @@ import 'package:cybertech/login.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterGrid.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
+import 'package:cybertech/pages/generalUser/generalUserHomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -44,6 +45,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
               DrawerContent(
                   title: "Employee Master",
+                  img: 'assets/images/nav/employeeMaster.png',
                   ontap: (){
                     setState(() {
                       menuSel=1;
@@ -53,6 +55,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               ),
               DrawerContent(
                   title: "Site Master",
+                  img: 'assets/images/nav/building.png',
                   ontap: (){
                     setState(() {
                       menuSel=2;
@@ -62,6 +65,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               ),
               DrawerContent(
                   title: "Site Assign",
+                  img: 'assets/images/nav/assignment.png',
                   ontap: (){
                     setState(() {
                       menuSel=3;
@@ -71,6 +75,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               ),
               DrawerContent(
                   title: "Track",
+                  img: 'assets/images/nav/placeholder.png',
                   ontap: (){
                     setState(() {
                       menuSel=4;
@@ -80,6 +85,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               ),
               DrawerContent(
                   title: "Attendance",
+                  img: 'assets/images/nav/attendance.png',
                   ontap: (){
                     setState(() {
                       menuSel=5;
@@ -89,6 +95,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               ),
               DrawerContent(
                   title: "Logout",
+                  img: 'assets/images/nav/logout.png',
                   ontap: (){
                     //  setState(() {
                     //   menuSel=2;
@@ -129,6 +136,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
 
 
+/*
 class DrawerContent extends StatelessWidget {
   VoidCallback ontap;
   String title;
@@ -150,4 +158,4 @@ class DrawerContent extends StatelessWidget {
       ),
     );
   }
-}
+}*/

@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         width: _width,
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("assets/svg/drawer/sidemenuBg.jpg"),
+                image: AssetImage("assets/images/loginBg.jpg"),
                 fit: BoxFit.cover
             ),
           color: bgColor
@@ -230,9 +230,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             debugPrint('App Settings opened: ' + hasOpened.toString()));
                       },
                     ),*/
-                    SizedBox(height: _height * 0.15,),
+                    SizedBox(height: _height * 0.19,),
 
-                //    SvgPicture.asset("assets/images/qms.svg",height: 100,),
+                  //  SvgPicture.asset("assets/svg/logo.svg",height: 100,),
                     SizedBox(height: 20,),
                     Form(
                         key: _loginFormKey,
@@ -369,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                   });
                                                 },
                                                 controller: username,
-                                                scrollPadding: EdgeInsets.only(bottom: 400),
+                                                scrollPadding: EdgeInsets.only(bottom: 200),
                                                 style:  TextStyle(fontFamily: 'RR',fontSize: 15,color:grey,letterSpacing: 0.2),
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
@@ -454,7 +454,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                 controller: password,
                                                 obscureText: passwordvisible,
                                                 obscuringCharacter: '*',
-                                                scrollPadding: EdgeInsets.only(bottom: 500),
+                                                scrollPadding: EdgeInsets.only(bottom: 200),
                                                 style:  TextStyle(fontFamily: 'RR',fontSize: 15,color:grey,letterSpacing: 0.2),
                                                 decoration: InputDecoration(
                                                   border: InputBorder.none,
@@ -530,6 +530,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               );
                             })
                     ),
+                    SizedBox(height: _height * 0.245,),
+                    Text(
+                      "@${DateFormat('yyyy').format(DateTime.now())}. All Rights Reserved. Designed by Cybertronics Pvt.Ltd",
+                      style: TextStyle(fontFamily: 'RR',  color: Colors.white,fontSize: 12 ),
+
+                    ),
+                   // Spacer(),
                   ],
                 ),
               ),
