@@ -21,7 +21,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
 
  late String prefEmail;
  late String prefPassword;
- late Map USERDETAIL;
+ Map USERDETAIL={};
 
 
  //rawScrollBar Properties
@@ -41,4 +41,5 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
 
  final usersRef = FirebaseDatabase.instance.reference().child("Users");
  final attendanceRef = FirebaseDatabase.instance.reference().child("Attendance");
+ final trackUsersRef=FirebaseDatabase.instance.reference().child("TrackUsers");
 

@@ -1,5 +1,12 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
 
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/location_dto.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/notifier/timeNotifier.dart';
@@ -12,8 +19,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as loca;
+import 'package:location_permissions/location_permissions.dart' as locPerm;
 import 'package:provider/provider.dart';
+
+import 'location_callback_handler.dart';
+import 'location_service_repository.dart';
 
 
 
@@ -36,72 +47,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
   final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
   var first;
   final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
-/*  Future<void> _listenLocation() async {
-    location.enableBackgroundMode(enable: true);
-    location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
-    //_location=location.getLocation() as LocationData?;
-    _locationSubscription =
-        location.onLocationChanged.handleError((dynamic err) {
-          if (err is PlatformException) {
-            setState(() {
-              _error = err.code;
-            });
-          }
-          _locationSubscription?.cancel();
-          setState(() {
-            _locationSubscription = null;
-          });
-        }).listen((LocationData currentLocation) async {
-          final coordinates = new Coordinates(currentLocation.latitude, currentLocation.longitude);
-          var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-        //  print("56 --- ${addresses.first.addressLine}");
-          if(first!=null){
-            if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
-              dbRef2.update({
-                'lat':currentLocation.latitude,
-                'long':currentLocation.longitude,
-              });
-              print("addresses.first if ${addresses.first.addressLine}");
-              setState(()  {
-            //    _error = null;
-              //  _location = currentLocation;
-                first = addresses.first;
-               // print(_location);
-              });
-            }
-          }
-          else{
-            dbRef2.update({
-              'lat':currentLocation.latitude,
-              'long':currentLocation.longitude,
-            });
-            print("addresses.first else ${addresses.first.addressLine}");
-            setState(()  {
-          //    _error = null;
-            //  _location = currentLocation;
-              first = addresses.first;
-           //   print(" ${first.featureName} : ${first.addressLine}");
-            });
-          }
-        });
-  //  setState(() {});
-  }*/
 
-/*  Future<void> _stopListen() async {
-    _locationSubscription?.cancel();
-    setState(() {
-      _locationSubscription = null;
-    });
-  }
-
-  @override
-  void dispose() {
-    _locationSubscription?.cancel();
-  //  setState(() {
-      _locationSubscription = null;
-    //});
-    super.dispose();
-  }*/
   Map currentDayInfo={};
   getCurrentDayInfo(){
     dbRef.child(DateFormat(dbDateFormat).format(DateTime.now())).child(USERDETAIL['Uid']).onValue.listen((value){
@@ -121,9 +67,23 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
 
   @override
   void initState() {
+
+    if (IsolateNameServer.lookupPortByName(LocationServiceRepository.isolateName) != null) {
+      IsolateNameServer.removePortNameMapping(LocationServiceRepository.isolateName);
+    }
+
+    IsolateNameServer.registerPortWithName(port.sendPort, LocationServiceRepository.isolateName);
+
+    port.listen(
+          (dynamic data) async {
+        await updateUI(data);
+      },
+    );
+    initPlatformState();
     Provider.of<LocationNotifier>(context,listen: false).listenLocation();
   //  _listenLocation();
     getCurrentDayInfo();
+
     super.initState();
   }
 /*  @override
@@ -164,7 +124,118 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
     super.didChangeDependencies();
   }*/
 
+  late LocationDto lastLocation;
+  ReceivePort port = ReceivePort();
+  late bool isRunning;
 
+  Future<void> initPlatformState() async {
+    print('Initializing...');
+    await BackgroundLocator.initialize();
+  //  logStr = await FileManager.readLogFile();
+    print('Initialization done');
+    final _isRunning = await BackgroundLocator.isServiceRunning();
+    _onStart();
+    setState(() {
+      isRunning = _isRunning;
+    });
+    print('Running ${isRunning.toString()}');
+  }
+
+  Future<void> updateUI(LocationDto data) async {
+  //  final log = await FileManager.readLogFile();
+
+    await _updateNotificationText(data);
+
+  //  setState(() {
+      if (data != null) {
+        lastLocation = data;
+      }
+   //   logStr = log;
+  //  });
+  }
+
+
+  Future<void> _updateNotificationText(LocationDto data) async {
+    if (data == null) {
+      return;
+    }
+
+    await BackgroundLocator.updateNotificationText(
+        title: "new location received",
+        msg: "${DateTime.now()}",
+        bigMsg: "${data.latitude}, ${data.longitude}");
+  }
+  void _onStart() async {
+    if (await _checkLocationPermission()) {
+      await _startLocator();
+      final _isRunning = await BackgroundLocator.isServiceRunning();
+
+   //   setState(() {
+        isRunning = _isRunning;
+
+     // });
+    } else {
+      // show error
+    }
+  }
+
+
+  void onStop() async {
+    await BackgroundLocator.unRegisterLocationUpdate();
+    final _isRunning = await BackgroundLocator.isServiceRunning();
+    setState(() {
+      isRunning = _isRunning;
+    });
+  }
+
+  Future<bool> _checkLocationPermission() async {
+    final access = await locPerm.LocationPermissions().checkPermissionStatus();
+    switch (access) {
+      case locPerm.PermissionStatus.unknown:
+      case locPerm.PermissionStatus.denied:
+      case locPerm.PermissionStatus.restricted:
+        final permission = await locPerm.LocationPermissions().requestPermissions(
+          permissionLevel: locPerm.LocationPermissionLevel.locationAlways,
+        );
+        if (permission == locPerm.PermissionStatus.granted) {
+          return true;
+        } else {
+          return false;
+        }
+        break;
+      case locPerm.PermissionStatus.granted:
+        return true;
+        break;
+      default:
+        return false;
+        break;
+    }
+  }
+
+  Future<void> _startLocator() async{
+    Map<String, dynamic> data = {'countInit': 1};
+    return await BackgroundLocator.registerLocationUpdate(LocationCallbackHandler.callback,
+        initCallback: LocationCallbackHandler.initCallback,
+        initDataCallback: data,
+        disposeCallback: LocationCallbackHandler.disposeCallback,
+        iosSettings: IOSSettings(
+            accuracy: LocationAccuracy.NAVIGATION, distanceFilter: 0),
+        autoStop: false,
+        androidSettings: AndroidSettings(
+            accuracy: LocationAccuracy.NAVIGATION,
+            interval: 5,
+            distanceFilter: 0,
+            client: LocationClient.google,
+            androidNotificationSettings: AndroidNotificationSettings(
+                notificationChannelName: 'Location tracking',
+                notificationTitle: 'Start Location Tracking',
+                notificationMsg: 'Track location in background',
+                notificationBigMsg:
+                'Turn on Location to track location.',
+                notificationIconColor: Colors.grey,
+                notificationTapCallback:
+                LocationCallbackHandler.notificationCallback)));
+  }
 
   @override
 
@@ -212,30 +283,11 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                         child: Image.asset("assets/attendance/logo.jpg", width: 80,fit: BoxFit.cover,),
                       ) ,*/
                       SizedBox(height: 5.0,),
-                      //Login Successful-UI-Start
 
-                      // Container(
-                      //     child: Text('Login Successful!',style: TextStyle(color: Color(0XFF2D972A),fontSize: 20,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
-                      // ),
-                      // SizedBox(height: 5.0,),
                       /*Container(
                          child: Text('${DateFormat.jms().format(DateTime.parse(currentDayInfo['LoginTime']))}',style: TextStyle(color: Color(0XFF000000),fontSize: 18,fontWeight: FontWeight.bold,fontFamily: 'RR'),),
                        ),*/
-                      // SizedBox(height:5.0,),
-                      // Container(
-                      //   width: width*0.27,
-                      //   height: 30,
-                      //   decoration: BoxDecoration(
-                      //     borderRadius: BorderRadius.circular(5),
-                      //     // boxShadow: [
-                      //     //   BoxShadow(color: Colors.green, spreadRadius: 3),
-                      //     // ],
-                      //     color: Colors.indigoAccent,
-                      //   ),
-                      //   child:Center(child: Text('19:31AM',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR',letterSpacing: 2.0), )) ,
-                      // ),
 
-                      //Login Successful-UI-End
                       Container(
                         child: Text('Welcome ${USERDETAIL['Name']}',
                           style: TextStyle(color: Color(0XFF000000),fontSize: 20,fontFamily: 'RR'),
@@ -296,6 +348,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                       currentDayInfo.isEmpty?Consumer<LocationNotifier>(
                         builder: (context,locNot,child)=>  GestureDetector(
                           onTap: () async {
+                            _onStart();
                           //  getCurrentDayInfo();
                           //   _location=await location.getLocation();
                           //   final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
@@ -345,13 +398,13 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                                         'LogoutTime':DateTime.now().toString(),
                                         'LogoutAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
                                       });
+                                      onStop();
                                       Navigator.pop(context);
                                     }
                                     else{
                                       locNot.listenLocation();
                                       Navigator.pop(context);
                                     }
-
                               }
                             ).cupertinoDialog1(context);
 

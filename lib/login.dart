@@ -57,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late SharedPreferences _Loginprefs;
   static const String useremail = 'email';
   static const String passwordd = 'password';
+  static const String Uid = 'Uid';
 
   AuthenticationHelper authenticationHelper=new AuthenticationHelper();
 
@@ -76,9 +77,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
   }
 
-  Future<Null> _setCredentials(String email,String pass) async {
+  Future<Null> _setCredentials(String email,String pass,String uid) async {
     await this._Loginprefs.setString(useremail, email);
     await this._Loginprefs.setString(passwordd, pass);
+    await this._Loginprefs.setString(Uid, uid);
      _loadCredentials();
   }
 
@@ -266,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                  .then((result) {
                                                if (result == null) {
                                                  print("UIS ${AuthenticationHelper().user}");
-                                                 _setCredentials(username.text, password.text);
+                                                 _setCredentials(username.text, password.text,AuthenticationHelper().user.uid);
                                                  usersRef.child(AuthenticationHelper().user.uid).once().then((value){
                                                    print(value.value);
                                                    setState(() {
@@ -545,21 +547,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               isLoad: isLoading,
             )
 
-    /*        Consumer<TimeNotifier>(
-              builder: (context,timeNotifier,child){
-               if(timeNotifier.locAlways!=locAlways){
-                 WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-                   setState(() {
-                     locAlways=timeNotifier.locAlways;
-                   });
-                 });
-
-                 print("TRUE");
-               }
-                return Container();
-              }
-            ),
-            !locAlways?locationDialog(context):Container()*/
           ],
         ),
       ),
@@ -578,7 +565,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
 
 
-//v-1.0.2
+//v-1.0.3
 
 
 

@@ -118,7 +118,10 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
 
       }
       else{
-        siteList=[];
+        setState(() {
+          siteList=[];
+        });
+
       }
     });
 /*    dbRef3.child(DateFormat(dbDateFormat).format(date!)).orderByKey().equalTo(USERDETAIL['Uid']).onValue.listen((event) {

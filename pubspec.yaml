@@ -46,6 +46,7 @@ dependencies:
   provider:
   cached_network_image:
   location_permissions:
+  background_locator:
   geocoder:
     path: ./flutter_geocoder-master
   month_picker_dialog:

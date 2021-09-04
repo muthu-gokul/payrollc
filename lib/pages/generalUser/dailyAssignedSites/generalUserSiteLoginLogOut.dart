@@ -345,6 +345,9 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                                     borderRadius: BorderRadius.circular(50),
                                     color: yellowColor
                                   ),
+                                  child: Center(
+                                    child: Text("Select Images",style: TextStyle(fontFamily: 'RR',color: Colors.white,fontSize: 14),),
+                                  ),
                                 ),
                               ),
                             ),

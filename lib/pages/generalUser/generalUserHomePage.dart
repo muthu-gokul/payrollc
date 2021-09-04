@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:background_locator/background_locator.dart';
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
@@ -153,12 +154,13 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
               DrawerContent(
                   title: "Logout",
                   img: 'assets/images/nav/logout.png',
-                  ontap: (){
+                  ontap: () async {
                     //  setState(() {
                     //   menuSel=2;
                     //   });
                     scaffoldKey.currentState!.openEndDrawer();
                     AuthenticationHelper().signOut();
+                    await BackgroundLocator.unRegisterLocationUpdate();
                     Navigator.pushAndRemoveUntil<dynamic>(
                       context,
                       MaterialPageRoute<dynamic>(

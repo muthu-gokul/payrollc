@@ -68,7 +68,7 @@ class LocationNotifier extends ChangeNotifier{
       locationData=await location.getLocation();
       final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
       var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      if(first!=null){
+     /* if(first!=null){
         if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
           dbRef2.update({
             'lat':locationData!.latitude,
@@ -87,7 +87,7 @@ class LocationNotifier extends ChangeNotifier{
         });
         first = addresses.first;
       //  print(first.addressLine);
-      }
+      }*/
     }
     if(isLocationServiceEnable){
       if(!await Location().isBackgroundModeEnabled()){
@@ -104,7 +104,7 @@ class LocationNotifier extends ChangeNotifier{
       location.onLocationChanged.listen((event) async {
         final coordinates = new Coordinates(event.latitude, event.longitude);
         var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-        if(first!=null){
+       /* if(first!=null){
           if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
             dbRef2.update({
               'lat':event.latitude,
@@ -125,32 +125,10 @@ class LocationNotifier extends ChangeNotifier{
           first = addresses.first;
           locationData=event;
          // print(first.addressLine);
-        }
+        }*/
       });
 
-   //   print("ENABLED");
-/*      locationData=await location.getLocation();
-      final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
-      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-     // print("56 --- ${addresses.first.addressLine}");
-      if(first!=null){
-        if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
-          dbRef2.update({
-            'lat':locationData!.latitude,
-            'long':locationData!.longitude,
-          });
-            first = addresses.first;
-        }
-        print(first.addressLine);
-      }
-      else{
-        dbRef2.update({
-          'lat':locationData!.latitude,
-          'long':locationData!.longitude,
-        });
-          first = addresses.first;
-        print(first.addressLine);
-      }*/
+
     }
     if(!tempSErvice && !isLocationServiceEnable){
       Timer(Duration(seconds: 10), (){
