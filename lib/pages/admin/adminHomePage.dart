@@ -84,7 +84,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
-                  title: "Attendance",
+                  title: "Attendance Report",
                   img: 'assets/images/nav/attendance.png',
                   ontap: (){
                     setState(() {

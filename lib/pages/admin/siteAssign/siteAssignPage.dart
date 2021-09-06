@@ -185,7 +185,7 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                       ),
                     ),
                     Container(
-                        height: SizeConfig.screenHeight!-155,
+                        height: SizeConfig.screenHeight!-200,
                         child: ListView.builder(
                       itemCount: widget.siteList.length,
 
@@ -206,7 +206,7 @@ class _SiteAssignPageState extends State<SiteAssignPage> {
                           child: Container(
                             height: 50,
                             width: SizeConfig.screenWidth,
-                            margin: EdgeInsets.only(left: 5,right: 5,bottom: i==widget.siteList.length?60:0),
+                            margin: EdgeInsets.only(left: 5,right: 5,bottom: i==widget.siteList.length-1?60:0),
                             decoration: BoxDecoration(
                                color: Colors.transparent,
                               // borderRadius: BorderRadius.circular(5),

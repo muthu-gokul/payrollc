@@ -110,7 +110,7 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
             ),
 
             Container(
-              height: SizeConfig.screenHeight!-110,
+              height: SizeConfig.screenHeight!-200,
               width: SizeConfig.screenWidth,
               margin: EdgeInsets.only(top: 110),
               child: lists.isEmpty? Text("No Data"):ListView.builder(
@@ -119,7 +119,8 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                   return  Container(
                     height: 50,
                     width: SizeConfig.screenWidth,
-                    margin: EdgeInsets.only(left: 5,right: 5),
+               //     padding: EdgeInsets.only(bottom: i==lists.length?20:0),
+                    margin: EdgeInsets.only(left: 5,right: 5,bottom: i==lists.length-1?30:0),
                     decoration: BoxDecoration(
                        // color: Colors.white,
                        // borderRadius: BorderRadius.circular(5),
@@ -131,7 +132,7 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                           height: 50,
                           width: 70,
                           alignment: Alignment.center,
-                          child: Text("${i+1}",style: gridTextColor14,),
+                          child: Text("${i+1} ",style: gridTextColor14,),
                         ),
                         Container(
                           height: 50,

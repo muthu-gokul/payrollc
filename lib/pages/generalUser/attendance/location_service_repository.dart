@@ -2,15 +2,12 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:background_locator/location_dto.dart';
 import 'package:cybertech/constants/constants.dart';
-import 'package:cybertech/main.dart';
-import 'package:cybertech/notifier/mySharedPref.dart';
+import 'package:cybertech/notifier/sqliteProvider.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoder/model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:sqflite/sqflite.dart';
 
 class LocationServiceRepository {
   static LocationServiceRepository _instance = LocationServiceRepository._();
@@ -26,8 +23,8 @@ class LocationServiceRepository {
   int _count = -1;
   var first;
   String uid="";
-  late SharedPreferences _Loginprefs;
 
+ // late Database? _db;
 
   Future<void> init(Map<dynamic, dynamic> params) async {
     //TODO change logs
@@ -46,12 +43,11 @@ class LocationServiceRepository {
     } else {
       _count = 0;
     }
-    SharedPreferences.getInstance()
-      ..then((prefs) {
-        this._Loginprefs = prefs;
-      });
+
+    first=null;
     print("$_count");
     await setLogLabel("start");
+    // _db= await SQLiteDbProvider.db.database;
     final SendPort? send = IsolateNameServer.lookupPortByName(isolateName);
     send?.send(null);
   }
@@ -73,20 +69,15 @@ class LocationServiceRepository {
     _count++;
     final coordinates = new Coordinates(locationDto.latitude, locationDto.longitude);
     var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    uid= this._Loginprefs.getString('Uid') ?? "";
-    print("UID $uid ${this._Loginprefs.getString('email')} ");
- /*   MySharedPreferences.instance
-        .getStringValue("Uid")
-        .then((value) {
-      uid=value;
-      print("UID $uid");*/
+    uid = await SQLiteDbProvider.db.getUID();
       if(first!=null){
         if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
           print("IFFFFFFFFFFFFFFFFFFFFFFFFFFFFF ${USERDETAIL['Uid']} ${uid} ");
           trackUsersRef.child(uid).update({
             'lat':locationDto.latitude,
             'long':locationDto.longitude,
-            'time':DateTime.now().toString()
+            'time':DateTime.now().toString(),
+            'address':addresses.first.addressLine
           });
           first = addresses.first;
         }
@@ -97,7 +88,8 @@ class LocationServiceRepository {
         trackUsersRef.child(uid).update({
           'lat':locationDto.latitude,
           'long':locationDto.longitude,
-          'time':DateTime.now().toString()
+          'time':DateTime.now().toString(),
+          'address':addresses.first.addressLine
         });
         first = addresses.first;
         //  print(first.addressLine);
@@ -113,6 +105,7 @@ class LocationServiceRepository {
 
   static Future<void> setLogPosition(int count, LocationDto data) async {
     final date = DateTime.now();
+
   //  await FileManager.writeToLogFile('$count : ${formatDateLog(date)} --> ${formatLog(data)} --- isMocked: ${data.isMocked}\n');
   }
 

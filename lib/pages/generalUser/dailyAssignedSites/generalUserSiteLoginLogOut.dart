@@ -38,6 +38,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
   List<XFile>? images=[];
 
   TextEditingController remarks=new TextEditingController();
+  bool isComplete=false;
 
   Future<List<String>> uploadImages(List<XFile>? images) async {
   //  if (images.length < 1) return "null";
@@ -305,6 +306,36 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               scrollPadding: 1000,
                             ),
                             SizedBox(height: 20,),
+                            Container(
+                              height: 30,
+                              width: SizeConfig.screenWidth,
+                              padding: EdgeInsets.only(left: SizeConfig.width10!,right: SizeConfig.width20!),
+                              child: Row(
+                                children: [
+
+                                  Checkbox(
+                                      fillColor: MaterialStateColor.resolveWith((states) => yellowColor),
+                                      value: isComplete,
+                                      onChanged: (v){
+                                        setState(() {
+                                          isComplete=v!;
+                                        });
+                                      }
+                                  ),
+                                  InkWell(
+                                      onTap: (){
+                                        setState(() {
+                                          isComplete=!isComplete;
+                                          });
+                                      },
+                                      child: Text("Work Complete ?",
+                                        style:  TextStyle(fontFamily: 'RR',fontSize: 16,color:grey,letterSpacing: 0.2),)
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 20,),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -541,7 +572,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                               'SiteLogoutLatitude':widget.latitude,
                               'SiteLogoutLongitude':widget.longitude,
                               'Images':value,
-                              'Remarks':remarks.text
+                              'Remarks':remarks.text,
+                              'WorkComplete':isComplete
                             });
                             dbRef2.update({
                               'lat':widget.latitude,
@@ -558,7 +590,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             'SiteLogoutAddress':widget.currentLocation,
                             'SiteLogoutLatitude':widget.latitude,
                             'SiteLogoutLongitude':widget.longitude,
-                            'Remarks':remarks.text
+                            'Remarks':remarks.text,
+                            'WorkComplete':isComplete
                           });
                           dbRef2.update({
                             'lat':widget.latitude,

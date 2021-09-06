@@ -173,8 +173,8 @@ class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
                              element['SiteLogoutLatitude']=ele['SiteLogoutLatitude'];
                              element['SiteLogoutLongitude']=ele['SiteLogoutLongitude'];
                              element['Remarks']=ele['Remarks'];
+                             element['WorkComplete']=ele['WorkComplete'];
                            });
-
                          }
                        });
                      });

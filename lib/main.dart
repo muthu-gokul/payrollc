@@ -1,4 +1,5 @@
 import 'package:cybertech/login.dart';
+import 'package:cybertech/sqlite.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,11 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loc.dart';
 import 'notifier/timeNotifier.dart';
-late SharedPreferences sp;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   runApp(MyApp());
 }
 
@@ -29,7 +29,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         debugShowCheckedModeBanner: false,
-       home: LoginScreen(),
+        home: LoginScreen(),
+     //  home: SqliteExample(),
        // home: LOC(),
       ),
     );

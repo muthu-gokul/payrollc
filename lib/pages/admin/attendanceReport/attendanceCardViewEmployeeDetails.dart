@@ -99,55 +99,78 @@ class _AttendanceCardViewEmpDetailsState extends State<AttendanceCardViewEmpDeta
                         duration: Duration(milliseconds: 500),
                         curve: Curves.easeIn,
                         clipBehavior: Clip.antiAlias,
-                        height: selIndex==i?220:50,
-                        margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+                        height: selIndex==i?320:40,
+                        margin: EdgeInsets.only(top: 10,left: 20,right: 20),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(5),
                             color: Colors.white,
-                            boxShadow: [
+                            border: Border.all(color:widget.details['Details'][i]['Attendance']=='P'?Colors.green:Colors.red )
+                         /*   boxShadow: [
                               BoxShadow(
                                 color: Colors.grey.withOpacity(0.15),
                                 spreadRadius: 1,
                                 blurRadius: 5,
                                 offset: Offset(1, 8), // changes position of shadow
                               )
-                            ]
+                            ]*/
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("${DateFormat.MMMd().format(DateTime.parse(widget.details['Details'][i]['Date']))}   ${widget.details['Details'][i]['Attendance']}"),
-                            SizedBox(height: 3,),
-                            Text("Login Details"),
-                            SizedBox(height: 2,),
-                            CustomListTile(
-                              height: 30,
-                              leading: Icon(Icons.timer,size: 15,),
-                              title: Text("${widget.details['Details'][i]['LoginTime']}"),
+                            Text("${DateFormat.MMMd().format(DateTime.parse(widget.details['Details'][i]['Date']))}   ${widget.details['Details'][i]['Attendance']}",
+                              style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 15),
                             ),
-                            CustomListTile(
-                              height: 30,
+                            SizedBox(height: 8,),
+                            Text("Login Details :",
+                                style: TextStyle(fontFamily: 'RM',color: grey,fontSize: 15)
+                            ),
+                            SizedBox(height: widget.details['Details'][i]['LoginTime']==null?0:8,),
+                            widget.details['Details'][i]['LoginTime']==null?Container():Container(
+                              child: CustomListTile(
+                                height: 30,
+                                leading: Icon(Icons.timer,size: 17,),
+                                title: Text("${DateFormat.jms().format(DateTime.parse(widget.details['Details'][i]['LoginTime']))}",
+                                    style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 14)),
+                              ),
+                            ),
+                            widget.details['Details'][i]['LoginTime']==null?Container():CustomListTile(
+                              height: 70,
                               leading: Icon(Icons.location_on_outlined,size: 20,color: Colors.red,),
                               title: Container(
-                                  width: width-100,
-                                  child: Text("${widget.details['Details'][i]['LoginAddress']}")),
+                                  width: width-120,
+                                  child: SingleChildScrollView(
+                                      child: Text("${widget.details['Details'][i]['LoginAddress']}",
+                                          style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 13.5)
+                                      )
+                                  )
+                              ),
                             ),
 
                             SizedBox(height: 20,),
-                            Text("LogOut Details"),
-                            SizedBox(height: 2,),
-                            CustomListTile(
-                              height: 30,
-                              leading: Icon(Icons.timer,size: 15,),
-                              title: Text("${widget.details['Details'][i]['LogoutTime']}"),
+                            Text("LogOut Details :",
+                                style: TextStyle(fontFamily: 'RM',color: grey,fontSize: 15)
                             ),
-                            CustomListTile(
-                              height: 30,
+                            SizedBox(height: 2,),
+                            widget.details['Details'][i]['LogoutTime']==null?Container():Container(
+                              child: CustomListTile(
+                                height: 30,
+                                leading: Icon(Icons.timer,size: 17,),
+                                title: Text("${DateFormat.jms().format(DateTime.parse(widget.details['Details'][i]['LogoutTime']))}",
+                                    style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 14)),
+                              ),
+                            ),
+                            widget.details['Details'][i]['LogoutTime']==null?Container():CustomListTile(
+                              height: 70,
                               leading: Icon(Icons.location_on_outlined,size: 20,color: Colors.red,),
                               title: Container(
-                                  width: width-100,
-                                  child: Text("${widget.details['Details'][i]['LogoutAddress']}")),
+                                  width: width-120,
+                                  child: SingleChildScrollView(
+                                      child: Text("${widget.details['Details'][i]['LogoutAddress']}",
+                                          style: TextStyle(fontFamily: 'RR',color: grey,fontSize: 13.5)
+                                      )
+                                  )
+                              ),
                             ),
                           ],
                         ),
@@ -177,6 +200,7 @@ class CustomListTile extends StatelessWidget {
     return Container(
       height: height,
       alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(left: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

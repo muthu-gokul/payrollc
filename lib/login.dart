@@ -1,4 +1,5 @@
-import 'dart:convert';
+import 'dart:io';
+import 'package:async/async.dart';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:background_locator/background_locator.dart';
@@ -7,7 +8,7 @@ import 'package:background_locator/settings/android_settings.dart';
 import 'package:background_locator/settings/ios_settings.dart';
 import 'package:background_locator/settings/locator_settings.dart' as locSettings ;
 import 'package:cybertech/main.dart';
-import 'package:cybertech/notifier/mySharedPref.dart';
+import 'package:cybertech/notifier/sqliteProvider.dart';
 import 'package:cybertech/pages/admin/adminHomePage.dart';
 import 'package:cybertech/pages/generalUser/attendance/location_callback_handler.dart';
 import 'package:cybertech/pages/generalUser/attendance/location_service_repository.dart';
@@ -18,10 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:intl/intl.dart';
-import 'package:location/location.dart';
 import 'package:location_permissions/location_permissions.dart' as locPer;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api/authentication.dart';
@@ -30,10 +29,9 @@ import 'notifier/timeNotifier.dart';
 import 'pages/generalUser/generalUserHomePage.dart';
 import 'widgets/alertDialog.dart';
 import 'widgets/loader.dart';
-
 import 'package:location_permissions/location_permissions.dart' as locPerm;
-
-
+import 'package:path/path.dart' as path;
+import 'package:sqflite/sqflite.dart';
 
 
 
@@ -71,12 +69,88 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   static const String passwordd = 'password';
   static const String Uid = 'Uid';
 
-  AuthenticationHelper authenticationHelper=new AuthenticationHelper();
+  static const kDbFileName = 'sqflite_ex.db';
+  static const kDbTableName2 = 'userDetails_tbl';
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+  late Database? _db;
+
+  Future<void> _initDb() async {
+    final dbFolder = await getDatabasesPath();
+    if (!await Directory(dbFolder).exists()) {
+      await Directory(dbFolder).create(recursive: true);
+    }
+    final dbPath = path.join(dbFolder, kDbFileName);
+    this._db = await openDatabase(
+      dbPath,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+        CREATE TABLE $kDbTableName2(
+          id INTEGER, 
+          email TEXT,
+          password TEXT,
+          uid TEXT)
+        ''');
+      },
+    );
+  }
+
+  Future<bool> _asyncInit() async {
+    await _memoizer.runOnce(() async {
+      _db= await SQLiteDbProvider.db.database;
+      _getTodoItems();
+   //   await _initDb();
+    });
+    return true;
+  }
+
+  Future<void> _getTodoItems() async {
+    final List<Map<String, dynamic>> jsons2 = await this._db!.rawQuery('SELECT * FROM $kDbTableName2');
+    print("jsons2 $jsons2");
+    if(jsons2.isNotEmpty){
+      setState(() {
+        username.text=jsons2[0]['email'];
+        password.text=jsons2[0]['password'];
+      });
+    }
+  }
+
+  Future<void> _addUserDetail(String email,String sqpassword,String squid) async {
+    final List<Map<String, dynamic>> jsons2 = await this._db!.rawQuery('SELECT * FROM $kDbTableName2');
+    if(jsons2.isEmpty){
+      await this._db!.transaction(
+            (Transaction txn) async {
+          await txn.rawInsert('''
+          INSERT INTO $kDbTableName2
+            (id, email, password, uid)
+          VALUES
+            (
+              1,
+              "$email", 
+              "$sqpassword",
+              "$squid"
+            )''');
+        },
+      );
+    }
+    else{
+      await this._db!.transaction(
+            (Transaction txn) async {
+          await txn.rawUpdate('''
+                    UPDATE $kDbTableName2 
+                    SET email = ?, password = ? , uid =?
+                    WHERE id = 1
+                    ''',
+              [email, sqpassword,squid]);
+        },
+      );
+    }
+    _getTodoItems();
+  }
+
 
   void _loadCredentials() {
-
     setState(() {
-     // AuthenticationHelper().pref_Email;
       prefEmail = this._Loginprefs.getString(useremail) ?? "";
       prefPassword= this._Loginprefs.getString(passwordd) ?? "";
     });
@@ -95,30 +169,29 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     print("SHARED UID $uid");
   // await MySharedPreferences.setStringValue(Uid, uid);
     await this._Loginprefs.setString(Uid, uid);
-    sp.setString("Uid2", uid);
      _loadCredentials();
   }
 
-initSp() async{
-  sp = await SharedPreferences.getInstance();
-}
+
 
   @override
   void initState() {
   //  SystemChrome.setEnabledSystemUIOverlays([]);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  initSp();
+
     passwordvisible = true;
     loginvalidation=false;
     shakecontroller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
     username.clear();
     password.clear();
     allowAccess();
-    SharedPreferences.getInstance()
+    _asyncInit();
+
+ /*   SharedPreferences.getInstance()
       ..then((prefs) {
         setState(() => this._Loginprefs = prefs);
         _loadCredentials();
-      });
+      });*/
     offsetAnimation = Tween(begin: 0.0, end: 28.0)
         .chain(CurveTween(curve: Curves.elasticIn))
         .animate(shakecontroller)
@@ -140,11 +213,12 @@ initSp() async{
 
     port.listen(
           (dynamic data) async {
+
         await updateUI(data);
       },
     );
    // initPlatformState();
-
+    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
     super.initState();
   }
   Future<void> requestPermission(locPer.LocationPermissionLevel permissionLevel) async {
@@ -280,7 +354,8 @@ initSp() async{
                                                  .then((result) {
                                                if (result == null) {
                                                  print("UIS ${AuthenticationHelper().user}");
-                                                 _setCredentials(username.text, password.text,AuthenticationHelper().user.uid);
+                                                // _setCredentials(username.text, password.text,AuthenticationHelper().user.uid);
+                                                 _addUserDetail(username.text, password.text,AuthenticationHelper().user.uid);
                                                  usersRef.child(AuthenticationHelper().user.uid).once().then((value){
                                                    print(value.value);
                                                    setState(() {

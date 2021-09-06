@@ -15,9 +15,8 @@ import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:geocoder/geocoder.dart';
+
 import 'package:intl/intl.dart';
 import 'package:location/location.dart' as loca;
 import 'package:location_permissions/location_permissions.dart' as locPerm;
@@ -80,7 +79,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
       },
     );*/
 //    initPlatformState();
- //   Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
   //  _listenLocation();
     getCurrentDayInfo();
 
@@ -227,7 +226,8 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                 'Turn on Location to track location.',
                 notificationIconColor: Colors.grey,
                 notificationTapCallback:
-                LocationCallbackHandler.notificationCallback)));
+                LocationCallbackHandler.notificationCallback)
+        ));
   }
 
   @override
@@ -341,13 +341,17 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                       currentDayInfo.isEmpty?Consumer<LocationNotifier>(
                         builder: (context,locNot,child)=>  GestureDetector(
                           onTap: () async {
-                            _onStart();
+                          //  _onStart();
                           //  getCurrentDayInfo();
                           //   _location=await location.getLocation();
                           //   final coordinates = new Coordinates(_location!.latitude, _location!.longitude);
                           //   var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
                           //   var first = addresses.first;
                           //   print("${first.featureName} : ${first.addressLine}");
+                            print(locNot.isLocationServiceEnable);
+                            print(locNot.locationData);
+                            if(locNot.first!=null)
+                            print(locNot.first.addressLine);
 
                             if(locNot.isLocationServiceEnable && locNot.locationData!=null && locNot.first!=null){
                               dbRef.child("${DateFormat(dbDateFormat).format(DateTime.now())}").child(USERDETAIL['Uid']).set({
@@ -358,6 +362,21 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                                 'LoginAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
 
                               });
+                            }
+                            else{
+                              print("ESLE");
+                              setState(() {
+                                locNot.locationData=null;
+                                locNot.first=null;
+                              });
+                             locNot.locationData=await loca.Location().getLocation().then((value) async {
+                               final coordinates = new Coordinates(value.latitude, value.longitude);
+                               var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+                               setState(() {
+                                 locNot.first=addresses.first;
+                               });
+                             });
+                            //  locNot.listenLocation();
                             }
 
 

@@ -70,9 +70,9 @@ class MapSampleState extends State<MapSample> {
     print(geoposition.longitude);
   }
 
-  showBottomModel(Map details,double lat,double long) async {
-    final coordinates = new Coordinates(lat, long);
-    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+  showBottomModel(Map details,double lat,double long,String address,String time) async {
+   // final coordinates = new Coordinates(lat, long);
+   // var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
 
     showModalBottomSheet(
         enableDrag: false,
@@ -95,10 +95,23 @@ class MapSampleState extends State<MapSample> {
                   Icon(Icons.location_on_outlined,color: Colors.red,),
                   Container(
                     width: SizeConfig.screenWidth!*0.8,
-                    child: Text("${addresses.first.addressLine}"
+                    child: Text("$address"
                       ,style: TextStyle(fontFamily: 'RR',fontSize: 14,color: Color(0xFF8E8E8E)),),
                   ),
                 ],
+              ),
+              SizedBox(height: 20,),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: RichText(
+                  text: TextSpan(
+                    text: '    Last Update at : ',
+                    style: TextStyle(fontSize: 15,color: Colors.green,fontFamily: 'RR'),
+                    children: <TextSpan>[
+                      TextSpan(text: '$time', style: TextStyle(fontSize: 15,color:grey,fontFamily: 'RM')),
+                    ],
+                  ),
+                ),
               ),
               SizedBox(height: 20,),
             ],
@@ -136,7 +149,7 @@ class MapSampleState extends State<MapSample> {
                                   dbRef.child(DateFormat(dbDateFormat).format(DateTime.now())).child(k).once().then((value){
                                     if(value.value!=null){
                                       print(value.value);
-                                      showBottomModel(value.value,v['lat'], v['long']);
+                                      showBottomModel(value.value,v['lat'], v['long'],v['address'],DateFormat.jms().format(DateTime.parse(v['time'])));
                                     }
                                     else{
                                       showDialog(
