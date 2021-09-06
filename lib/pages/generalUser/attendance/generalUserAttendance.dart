@@ -68,7 +68,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
   @override
   void initState() {
 
-    if (IsolateNameServer.lookupPortByName(LocationServiceRepository.isolateName) != null) {
+/*    if (IsolateNameServer.lookupPortByName(LocationServiceRepository.isolateName) != null) {
       IsolateNameServer.removePortNameMapping(LocationServiceRepository.isolateName);
     }
 
@@ -78,9 +78,9 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
           (dynamic data) async {
         await updateUI(data);
       },
-    );
-    initPlatformState();
-    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+    );*/
+//    initPlatformState();
+ //   Provider.of<LocationNotifier>(context,listen: false).listenLocation();
   //  _listenLocation();
     getCurrentDayInfo();
 
@@ -140,7 +140,6 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
     });
     print('Running ${isRunning.toString()}');
   }
-
   Future<void> updateUI(LocationDto data) async {
   //  final log = await FileManager.readLogFile();
 
@@ -153,8 +152,6 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
    //   logStr = log;
   //  });
   }
-
-
   Future<void> _updateNotificationText(LocationDto data) async {
     if (data == null) {
       return;
@@ -178,8 +175,6 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
       // show error
     }
   }
-
-
   void onStop() async {
     await BackgroundLocator.unRegisterLocationUpdate();
     final _isRunning = await BackgroundLocator.isServiceRunning();
@@ -187,7 +182,6 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
       isRunning = _isRunning;
     });
   }
-
   Future<bool> _checkLocationPermission() async {
     final access = await locPerm.LocationPermissions().checkPermissionStatus();
     switch (access) {
@@ -211,7 +205,6 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
         break;
     }
   }
-
   Future<void> _startLocator() async{
     Map<String, dynamic> data = {'countInit': 1};
     return await BackgroundLocator.registerLocationUpdate(LocationCallbackHandler.callback,

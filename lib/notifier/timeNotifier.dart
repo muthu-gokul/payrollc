@@ -57,18 +57,18 @@ class LocationNotifier extends ChangeNotifier{
    listenLocation() async {
 
     //locationData=location.getLocation() as LocationData?;
-    bool tempSErvice=await location.serviceEnabled();
+   /* bool tempSErvice=await location.serviceEnabled();
 
 
   //s  print(isLocationServiceEnable);
     if(isLocationServiceEnable != tempSErvice){
       isLocationServiceEnable=tempSErvice;
-      location.enableBackgroundMode(enable: true);
+   //   location.enableBackgroundMode(enable: true);
       location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
       locationData=await location.getLocation();
       final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
       var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-     /* if(first!=null){
+     *//* if(first!=null){
         if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
           dbRef2.update({
             'lat':locationData!.latitude,
@@ -87,12 +87,12 @@ class LocationNotifier extends ChangeNotifier{
         });
         first = addresses.first;
       //  print(first.addressLine);
-      }*/
+      }*//*
     }
     if(isLocationServiceEnable){
-      if(!await Location().isBackgroundModeEnabled()){
-        location.enableBackgroundMode(enable: true);
-      }
+   //   if(!await Location().isBackgroundModeEnabled()){
+    //    location.enableBackgroundMode(enable: true);
+     // }
       if(locationData==null|| first ==null){
         locationData=await location.getLocation();
         final coordinates = new Coordinates(locationData!.latitude, locationData!.longitude);
@@ -101,10 +101,10 @@ class LocationNotifier extends ChangeNotifier{
         notifyListeners();
       }
 
-      location.onLocationChanged.listen((event) async {
+ *//*     location.onLocationChanged.listen((event) async {
         final coordinates = new Coordinates(event.latitude, event.longitude);
         var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-       /* if(first!=null){
+       *//**//* if(first!=null){
           if(addresses.first.featureName!=first.featureName && addresses.first.addressLine!=first.addressLine){
             dbRef2.update({
               'lat':event.latitude,
@@ -125,18 +125,18 @@ class LocationNotifier extends ChangeNotifier{
           first = addresses.first;
           locationData=event;
          // print(first.addressLine);
-        }*/
-      });
+        }*//**//*
+      });*//*
 
 
     }
     if(!tempSErvice && !isLocationServiceEnable){
       Timer(Duration(seconds: 10), (){
-        location.enableBackgroundMode(enable: true);
+       // location.enableBackgroundMode(enable: true);
         location.changeSettings(accuracy: LocationAccuracy.high,interval: 2000,);
 
       });
-    }
+    }*/
     notifyListeners();
 
 

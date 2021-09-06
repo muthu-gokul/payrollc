@@ -1,5 +1,16 @@
 import 'dart:convert';
+import 'dart:isolate';
+import 'dart:ui';
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/location_dto.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart' as locSettings ;
+import 'package:cybertech/main.dart';
+import 'package:cybertech/notifier/mySharedPref.dart';
 import 'package:cybertech/pages/admin/adminHomePage.dart';
+import 'package:cybertech/pages/generalUser/attendance/location_callback_handler.dart';
+import 'package:cybertech/pages/generalUser/attendance/location_service_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +31,7 @@ import 'pages/generalUser/generalUserHomePage.dart';
 import 'widgets/alertDialog.dart';
 import 'widgets/loader.dart';
 
+import 'package:location_permissions/location_permissions.dart' as locPerm;
 
 
 
@@ -80,17 +92,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Future<Null> _setCredentials(String email,String pass,String uid) async {
     await this._Loginprefs.setString(useremail, email);
     await this._Loginprefs.setString(passwordd, pass);
+    print("SHARED UID $uid");
+  // await MySharedPreferences.setStringValue(Uid, uid);
     await this._Loginprefs.setString(Uid, uid);
+    sp.setString("Uid2", uid);
      _loadCredentials();
   }
 
-
+initSp() async{
+  sp = await SharedPreferences.getInstance();
+}
 
   @override
   void initState() {
   //  SystemChrome.setEnabledSystemUIOverlays([]);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-
+  initSp();
     passwordvisible = true;
     loginvalidation=false;
     shakecontroller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
@@ -114,6 +131,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           });
         }
       });
+
+    if (IsolateNameServer.lookupPortByName(LocationServiceRepository.isolateName) != null) {
+      IsolateNameServer.removePortNameMapping(LocationServiceRepository.isolateName);
+    }
+
+    IsolateNameServer.registerPortWithName(port.sendPort, LocationServiceRepository.isolateName);
+
+    port.listen(
+          (dynamic data) async {
+        await updateUI(data);
+      },
+    );
+   // initPlatformState();
 
     super.initState();
   }
@@ -168,26 +198,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
      //   print("permissionRequestResult ${permissionRequestResult}");
      // });
     }
-      /*     if(!status2.isGranted){
-       await Permission.locationAlways.request();
-    }
-     else if(status2.isDenied){
-       print("isDenied");
-       await Permission.locationAlways.request();
-     }
-     else if(status2.isRestricted){
-       print("RESTRICTED");
-       await Permission.locationAlways.request();
-     }*/
-     /*if(status2.isGranted){
-       Location().requestService();
-     }*/
-    // final PermissionHandler _permissionHandler = PermissionHandler();
-    // var result = await _permissionHandler.requestPermissions([PermissionGroup.storage]);
-    // if(result[PermissionGroup.storage] == PermissionStatus.granted) {
-    //   String dir = (await getApplicationDocumentsDirectory()).path;
-    //   await Directory('$dir/images').create(recursive: true);
-    // }
+
 
   }
 
@@ -250,6 +261,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                                     GestureDetector(
                                       onTap:() async {
+
                                          node.unfocus();
                                      /*    final locPer.PermissionStatus permissionRequestResult = await locPer.LocationPermissions()
                                              .requestPermissions(permissionLevel: locPer.LocationPermissionLevel.locationAlways);*/
@@ -281,6 +293,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
                                                    }
                                                    if(USERDETAIL['UserGroupId']==2){
+                                                     initPlatformState();
                                                      FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
                                                        'lat':"null",
                                                        'long':"null",
@@ -560,12 +573,116 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   }
 
 
+  late LocationDto lastLocation;
+  ReceivePort port = ReceivePort();
+  late bool isRunning;
 
+  Future<void> initPlatformState() async {
+    print('Initializing...');
+    await BackgroundLocator.initialize();
+    //  logStr = await FileManager.readLogFile();
+    print('Initialization done');
+    final _isRunning = await BackgroundLocator.isServiceRunning();
+    _onStart();
+    setState(() {
+      isRunning = _isRunning;
+    });
+    print('Running ${isRunning.toString()}');
+  }
+  Future<void> updateUI(LocationDto data) async {
+    //  final log = await FileManager.readLogFile();
+
+    await _updateNotificationText(data);
+
+    //  setState(() {
+    if (data != null) {
+      lastLocation = data;
+    }
+    //   logStr = log;
+    //  });
+  }
+  Future<void> _updateNotificationText(LocationDto data) async {
+    if (data == null) {
+      return;
+    }
+
+    await BackgroundLocator.updateNotificationText(
+        title: "new location received",
+        msg: "${DateTime.now()}",
+        bigMsg: "${data.latitude}, ${data.longitude}");
+  }
+  void _onStart() async {
+    if (await _checkLocationPermission()) {
+      await _startLocator();
+      final _isRunning = await BackgroundLocator.isServiceRunning();
+
+      //   setState(() {
+      isRunning = _isRunning;
+
+      // });
+    } else {
+      // show error
+    }
+  }
+  void onStop() async {
+    await BackgroundLocator.unRegisterLocationUpdate();
+    final _isRunning = await BackgroundLocator.isServiceRunning();
+    setState(() {
+      isRunning = _isRunning;
+    });
+  }
+  Future<bool> _checkLocationPermission() async {
+    final access = await locPerm.LocationPermissions().checkPermissionStatus();
+    switch (access) {
+      case locPerm.PermissionStatus.unknown:
+      case locPerm.PermissionStatus.denied:
+      case locPerm.PermissionStatus.restricted:
+        final permission = await locPerm.LocationPermissions().requestPermissions(
+          permissionLevel: locPerm.LocationPermissionLevel.locationAlways,
+        );
+        if (permission == locPerm.PermissionStatus.granted) {
+          return true;
+        } else {
+          return false;
+        }
+        break;
+      case locPerm.PermissionStatus.granted:
+        return true;
+        break;
+      default:
+        return false;
+        break;
+    }
+  }
+  Future<void> _startLocator() async{
+    Map<String, dynamic> data = {'countInit': 1};
+    return await BackgroundLocator.registerLocationUpdate(LocationCallbackHandler.callback,
+        initCallback: LocationCallbackHandler.initCallback,
+        initDataCallback: data,
+        disposeCallback: LocationCallbackHandler.disposeCallback,
+        iosSettings: IOSSettings(
+            accuracy: locSettings.LocationAccuracy.NAVIGATION, distanceFilter: 0),
+        autoStop: false,
+        androidSettings: AndroidSettings(
+            accuracy: locSettings.LocationAccuracy.NAVIGATION,
+            interval: 5,
+            distanceFilter: 0,
+            client: LocationClient.google,
+            androidNotificationSettings: AndroidNotificationSettings(
+                notificationChannelName: 'Location tracking',
+                notificationTitle: 'Start Location Tracking',
+                notificationMsg: 'Track location in background',
+                notificationBigMsg:
+                'Turn on Location to track location.',
+                notificationIconColor: Colors.grey,
+                notificationTapCallback:
+                LocationCallbackHandler.notificationCallback)));
+  }
 }
 
 
 
-//v-1.0.3
+//v-1.0.4
 
 
 
