@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       },
     );
    // initPlatformState();
-    Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+
     super.initState();
   }
   Future<void> requestPermission(locPer.LocationPermissionLevel permissionLevel) async {
@@ -369,6 +369,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                    }
                                                    if(USERDETAIL['UserGroupId']==2){
                                                      initPlatformState();
+                                                     Provider.of<LocationNotifier>(context,listen: false).listenLocation();
                                                      FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
                                                        'lat':"null",
                                                        'long':"null",

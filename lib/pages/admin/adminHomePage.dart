@@ -3,6 +3,7 @@ import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/login.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterGrid.dart';
+import 'package:cybertech/pages/admin/serviceReport/serviceReportUsersList.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:cybertech/pages/generalUser/generalUserHomePage.dart';
@@ -94,6 +95,16 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Service Report",
+                  img: 'assets/images/nav/attendance.png',
+                  ontap: (){
+                    setState(() {
+                      menuSel=6;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   img: 'assets/images/nav/logout.png',
                   ontap: (){
@@ -127,6 +138,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
           scaffoldKey.currentState!.openDrawer();
         }):
         menuSel==5?AttendanceOverView(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        menuSel==6?ServiceReportEmployeeList(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):Container(),
       ),
