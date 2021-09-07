@@ -43,3 +43,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
  final attendanceRef = FirebaseDatabase.instance.reference().child("Attendance");
  final trackUsersRef=FirebaseDatabase.instance.reference().child("TrackUsers");
 
+
+
+ String decimalReg=r'^\d+\.?\d{0,2}';
+

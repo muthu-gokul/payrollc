@@ -9,7 +9,9 @@ import 'package:cybertech/notifier/timeNotifier.dart';
 import 'package:cybertech/pages/admin/employeeMaster/employeeMasterGrid.dart';
 import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
+import 'package:cybertech/pages/generalUser/expenses/expensesGrid.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -124,6 +126,17 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
                     scaffoldKey.currentState!.openEndDrawer();
                   }
               ),
+              DrawerContent(
+                  title: "Expenses",
+                  img: 'assets/svg/expenses.svg',
+                  isPng: false,
+                  ontap: (){
+                    setState(() {
+                      menuSel=3;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
         /*      DrawerContent(
                   title: "Site Master",
                   ontap: (){
@@ -179,7 +192,7 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
         menuSel==2?GeneralUserDailySites(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):
-        menuSel==3?SiteEmployeeGrid(drawerCallback: (){
+        menuSel==3?GeneralUserExpenseGrid(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }): Container(),
       ),
@@ -193,7 +206,8 @@ class DrawerContent extends StatelessWidget {
   VoidCallback ontap;
   String title;
   String img;
-  DrawerContent({required this.title,required this.ontap,required this.img});
+  bool isPng;
+  DrawerContent({required this.title,required this.ontap,required this.img,this.isPng=true});
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +223,7 @@ class DrawerContent extends StatelessWidget {
         padding: EdgeInsets.only(left: 10),
         child: Row(
           children: [
-            Image.asset(img,height: 25,),
+            isPng?Image.asset(img,height: 25,):SvgPicture.asset(img,height: 25,),
             Text("    $title",style: TextStyle(fontFamily: 'RR',color: Color(0xFF444444),fontSize: 16),),
           ],
         ),

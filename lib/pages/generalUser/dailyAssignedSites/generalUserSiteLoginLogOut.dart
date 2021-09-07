@@ -360,7 +360,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             GestureDetector(
                               onTap: () async{
 
-                               images  = await picker.pickMultiImage(imageQuality: 50);
+                               images  = await picker.pickMultiImage(imageQuality: 50,);
 
                                 setState(() {
 
