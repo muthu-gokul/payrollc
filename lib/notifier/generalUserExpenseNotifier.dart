@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cybertech/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,14 +10,13 @@ class GeneralUserExpenseNotifier extends ChangeNotifier{
 
 
   getData(DateTime? date){
-    dbRef.child(DateFormat(dbDateFormat).format(date!)).child(USERDETAIL['Uid']).once().then((event) {
+    dbRef.child(DateFormat(dbDateFormat).format(date!)).child(USERDETAIL['Uid']).child("ExpensesList").once().then((event) {
       lists.clear();
       // DataSnapshot dataValues = event.snapshot;
       if(event.value!=null){
         Map<dynamic, dynamic> values = event.value;
-        print("LIST  $values");
+       // log("LIST  $values");
         values.forEach((key, values) {
-
             values['Key']=key;
             lists.add(values);
 

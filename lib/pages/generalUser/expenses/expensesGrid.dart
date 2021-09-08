@@ -89,8 +89,6 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
     });
 
 
-
-
     header.addListener(() {
       if(body.offset!=header.offset){
         body.jumpTo(header.offset);
@@ -156,32 +154,7 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                 ],
               ),
             ),
-            Container(
-              height: 50,
-              width: SizeConfig.screenWidth,
-              margin: EdgeInsets.only(left: 5,right: 5,top: 55),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: addNewTextFieldBorder)
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    height: 50,
-                    width: 70,
-                    alignment: Alignment.center,
-                    child: Text("S.No",style: gridHeaderTS,),
-                  ),
-                  Container(
-                    height: 50,
-                    width: SizeConfig.screenWidth!-82,
-                    alignment: Alignment.centerLeft,
-                    child: Text("Site Name",style: gridHeaderTS,),
-                  )
-                ],
-              ),
-            ),
+
 
             Consumer<GeneralUserExpenseNotifier>(
               builder:(ctx,not,child)=> Container(

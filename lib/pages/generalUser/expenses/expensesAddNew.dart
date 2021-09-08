@@ -337,10 +337,14 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                         isLoad=true;
                       });
                      String key= databaseReference.child("Expenses").child(DateFormat(dbDateFormat).format(DateTime.now()))
-                          .child(USERDETAIL['Uid']).push().key;
+                          .child(USERDETAIL['Uid']).child("ExpensesList").push().key;
+
+                      databaseReference.child("Expenses").child(DateFormat(dbDateFormat).format(DateTime.now()))
+                          .child(USERDETAIL['Uid']).child("UserDetail").set(USERDETAIL);
+
                       uploadImages(images,key).then((v){
                         databaseReference.child("Expenses").child(DateFormat(dbDateFormat).format(DateTime.now()))
-                            .child(USERDETAIL['Uid']).child(key).set({
+                            .child(USERDETAIL['Uid']).child("ExpensesList").child(key).set({
                           'ExpenseName':expenseName.text,
                           'ExpenseValue':double.parse(value.text),
                           'SiteName':selectedSite['SiteName'],
@@ -348,6 +352,7 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                           'Status':'Pending',
                           'Images':v
                         }).onError((error, stackTrace){
+                          print("stackTrace $stackTrace ");
                           setState(() {
                             isLoad=false;
                           });

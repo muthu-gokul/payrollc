@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'attendanceReport/attendanceMonthWise.dart';
+import 'expenseReport/expenseReportUsersList.dart';
 import 'mapScreen.dart';
 class AdminHomePage extends StatefulWidget {
   @override
@@ -105,6 +106,17 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Expense Report",
+                  img: 'assets/svg/expenses.svg',
+                  isPng: false,
+                  ontap: (){
+                    setState(() {
+                      menuSel=7;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   img: 'assets/images/nav/logout.png',
                   ontap: (){
@@ -141,6 +153,9 @@ class _AdminHomePageState extends State<AdminHomePage> {
           scaffoldKey.currentState!.openDrawer();
         }):
         menuSel==6?ServiceReportEmployeeList(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        menuSel==7?ExpenseReportEmployeeList(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }):Container(),
       ),

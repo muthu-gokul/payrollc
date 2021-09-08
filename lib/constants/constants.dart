@@ -17,6 +17,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
  TextStyle bgColorTS14=TextStyle(fontFamily: 'RR',color: bgColor,fontSize: 14);
  TextStyle gridHeaderTS=TextStyle(fontFamily: 'RR',color: bgColor,fontSize: 16);
  TextStyle gridTextColor14=TextStyle(fontFamily: 'RR',color: grey,fontSize: 14);
+ TextStyle greyTextColor16=TextStyle(fontFamily: 'RR',color: grey,fontSize: 16);
  TextStyle TSWhite166=TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white,letterSpacing: 0.1);
  TextStyle hintText=TextStyle(fontFamily: 'RR',fontSize: 16,color: grey.withOpacity(0.5));
 
