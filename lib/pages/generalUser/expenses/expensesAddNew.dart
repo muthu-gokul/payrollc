@@ -1,8 +1,10 @@
 
 import 'dart:developer';
+import 'dart:io';
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
+import 'package:cybertech/notifier/generalUserExpenseNotifier.dart';
 import 'package:cybertech/pages/admin/serviceReport/serviceReportSiteDetail.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/arrowBack.dart';
@@ -13,7 +15,11 @@ import 'package:cybertech/widgets/loader.dart';
 import 'package:cybertech/widgets/popOver/src/popover.dart';
 import 'package:cybertech/widgets/popOver/src/popover_direction.dart';
 import 'package:cybertech/widgets/validationErrorText.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -41,9 +47,38 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
   bool v_expenseName=false;
   bool v_value=false;
   bool v_site=false;
+  bool v_images=false;
 
 
 
+
+
+  final picker = ImagePicker();
+  List<XFile>? images=[];
+
+  Future<List<String>> uploadImages(List<XFile>? images,String key) async {
+    //  if (images.length < 1) return "null";
+    print("KEY $key");
+    List<String> _downloadUrls = [];
+    int i=0;
+    await Future.forEach(images!, (image) async {
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('Expenses')
+          .child(DateFormat(dbDateFormat).format(DateTime.now()))
+          .child(USERDETAIL['Uid'])
+          .child(key)
+          .child("$i");
+
+      final UploadTask uploadTask = ref.putFile(File(images[i].path));
+      final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+      final url = await taskSnapshot.ref.getDownloadURL();
+      _downloadUrls.add(url);
+      i++;
+    });
+
+    return _downloadUrls;
+  }
   @override
   void initState() {
 
@@ -182,6 +217,49 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                         ),
                       ),
                       !v_site?Container():ValidationErrorText(),
+
+                      images!.isEmpty?Container():Container(
+                        height: 220,
+                        margin: EdgeInsets.all(10),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          physics: BouncingScrollPhysics(),
+                          itemCount: images!.length,
+                          itemBuilder: (ctx,i){
+                            return Container(
+                              margin: EdgeInsets.all(10),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(17),
+                                child:  Image.file(File(images![i].path)),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async{
+
+                          images  = await picker.pickMultiImage(imageQuality: 25,);
+
+                          setState(() {});
+
+                        },
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            height: 50,
+                            width: 120,
+                            margin: EdgeInsets.only(top: 20),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: yellowColor
+                            ),
+                            child: Center(
+                              child: Text("Select Images",style: TextStyle(fontFamily: 'RR',color: Colors.white,fontSize: 14),),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                 )
 
@@ -251,8 +329,36 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                     if(selectedSite.isEmpty){setState(() {v_site=true;});}
                     else{setState(() {v_site=false;});}
 
-                    if(!v_value && !v_expenseName){
-                      Navigator.pop(context);
+                    if(images!.isEmpty){setState(() {v_images=true;});}
+                    else{setState(() {v_images=false;});}
+
+                    if(!v_value && !v_expenseName && !v_images && !v_site){
+                      setState(() {
+                        isLoad=true;
+                      });
+                     String key= databaseReference.child("Expenses").child(DateFormat(dbDateFormat).format(DateTime.now()))
+                          .child(USERDETAIL['Uid']).push().key;
+                      uploadImages(images,key).then((v){
+                        databaseReference.child("Expenses").child(DateFormat(dbDateFormat).format(DateTime.now()))
+                            .child(USERDETAIL['Uid']).child(key).set({
+                          'ExpenseName':expenseName.text,
+                          'ExpenseValue':double.parse(value.text),
+                          'SiteName':selectedSite['SiteName'],
+                          'SiteId':selectedSite['Key'],
+                          'Status':'Pending',
+                          'Images':v
+                        }).onError((error, stackTrace){
+                          setState(() {
+                            isLoad=false;
+                          });
+                        });
+                        Provider.of<GeneralUserExpenseNotifier>(context,listen: false).getData(DateTime.now());
+                        setState(() {
+                          isLoad=false;
+                        });
+                        Navigator.pop(context);
+                      });
+
                     }
 
                   },

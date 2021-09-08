@@ -32,8 +32,10 @@ class ExpectedDateContainer extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: iconColor
               ),
-
-              child: Center(child: Icon(Icons.calendar_today,color:Colors.grey ,size: 20,)))
+              child: Center(
+                  child: Icon(Icons.calendar_today,color:Colors.grey ,size: 20,)
+              )
+          )
         ],
       ),
     );

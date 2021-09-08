@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'loc.dart';
+import 'notifier/generalUserExpenseNotifier.dart';
 import 'notifier/timeNotifier.dart';
 
 Future<void> main() async {
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<TimeNotifier>(create: (_)=>TimeNotifier()),
         ChangeNotifierProvider<LocationNotifier>(create: (_)=>LocationNotifier()),
+        ChangeNotifierProvider<GeneralUserExpenseNotifier>(create: (_)=>GeneralUserExpenseNotifier()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',

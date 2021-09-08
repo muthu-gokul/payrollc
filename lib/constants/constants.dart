@@ -1,5 +1,6 @@
  import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Color yellowColor=Color(0xFF158BCC);
 Color bgColor=Color(0xFF4267F6);
@@ -19,6 +20,11 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
  TextStyle TSWhite166=TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white,letterSpacing: 0.1);
  TextStyle hintText=TextStyle(fontFamily: 'RR',fontSize: 16,color: grey.withOpacity(0.5));
 
+
+
+
+
+
  late String prefEmail;
  late String prefPassword;
  Map USERDETAIL={};
@@ -34,7 +40,7 @@ const Color addNewTextFieldFocusBorder=Color(0xFF6B6B6B);
  Color attendanceMonthGridBodyBgColor=Color(0xFFF6F7F9);
  String dbDateFormat="yyyy-MM-dd";
 
-
+ var formatCurrency = NumberFormat.currency(locale: 'HI',name: "");
 
 
  final databaseReference = FirebaseDatabase.instance.reference();

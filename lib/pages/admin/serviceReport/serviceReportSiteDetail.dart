@@ -191,7 +191,6 @@ class _ServiceReportSiteDetailState extends State<ServiceReportSiteDetail> {
                                );
                              },
                            ),
-
                           ),
                           SizedBox(height: 70,),
                         ],
@@ -255,6 +254,7 @@ class _ServiceReportSiteDetailState extends State<ServiceReportSiteDetail> {
                 alignment: Alignment.bottomCenter,
                 child: AddButton(
                   ontap: (){
+
                     Navigator.pop(context);
                   },
                 )
