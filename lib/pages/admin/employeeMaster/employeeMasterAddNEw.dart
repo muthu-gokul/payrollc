@@ -40,7 +40,8 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
   TextEditingController nameTextController = new TextEditingController();
   TextEditingController emailController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
-  TextEditingController vehNoController = new TextEditingController();
+  TextEditingController phNoController = new TextEditingController();
+  TextEditingController empIdController = new TextEditingController();
   String editUid="";
   String? editUrl=null;
 
@@ -49,20 +50,32 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
   bool email=false;
   bool emailValid=true;
   bool userGroup=false;
+  bool phNo=false;
+  bool empId=false;
 
 
   bool isLoad=false;
   bool userGroupOpen=false;
+  bool regionOpen=false;
 
   int? userGroupId=null;
   String? userGroupName=null;
 
-  final databaseReference = FirebaseDatabase.instance.reference();
+
   List<dynamic> userGroupList=[
     {"UserGroupId": 1, "UserGroupName": "Admin"},
     {"UserGroupId": 2, "UserGroupName": "GeneralUser"},
     {"UserGroupId": 3, "UserGroupName": "Sales Executive"}
     ];
+
+  int? selectedRegionId=null;
+  String? selectedRegion=null;
+  List<dynamic> regionList=[
+    {"RegionName": "Chennai","RegionId":1},
+    {"RegionName": "Kerala","RegionId":2},
+    {"RegionName": "Karnataka","RegionId":3},
+    {"RegionName": "Andhra Pradesh","RegionId":4},
+  ];
 
   File? _imageFile;
   final picker = ImagePicker();
@@ -284,6 +297,18 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                       SizedBox(height: 20,),
                       AddNewLabelTextField(
                         ontap: (){},
+                        labelText: 'Employee Id',
+                        regExp: '[A-Za-z0-9]',
+                        textEditingController: empIdController,
+                        maxlines: 1,
+                        onChange: (v){},
+                        onEditComplete: (){
+                          node.unfocus();
+                        },
+                      ),
+                      !empId?Container():ValidationErrorText(),
+                      AddNewLabelTextField(
+                        ontap: (){},
                         labelText: 'Name',
                         regExp: '[A-Za-z  ]',
                         textEditingController: nameTextController,
@@ -294,6 +319,19 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                         },
                       ),
                       !name?Container():ValidationErrorText(),
+                      AddNewLabelTextField(
+                        ontap: (){},
+                        labelText: 'Contact Number',
+                        regExp: '[0-9]',
+                        textEditingController: phNoController,
+                        maxlines: 1,
+                        textLength: 10,
+                        onChange: (v){},
+                        onEditComplete: (){
+                          node.unfocus();
+                        },
+                      ),
+                      !phNo?Container():ValidationErrorText(title: '* Contact Number should be 10 digits',),
                       AddNewLabelTextField(
                         ontap: (){},
                         labelText: 'Email',
@@ -328,13 +366,6 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                           setState(() {
                             userGroupOpen=true;
                           });
-                         /* if(mun.isEdit){
-                            setState(() {
-                              userGroupOpen=true;
-                              _keyboardVisible=false;
-                            });
-                          }*/
-
                         },
                         child: SidePopUpParent(
                           text:userGroupName==null? "Select User Group":userGroupName,
@@ -347,14 +378,43 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                       ),
                       !userGroup?Container():ValidationErrorText(),
 
+                      GestureDetector(
+                        onTap: (){
+                          node.unfocus();
+                          setState(() {
+                            regionOpen=true;
+                          });
+                        },
+                        child: SidePopUpParent(
+                          text:selectedRegion==null? "Select Region":selectedRegion,
+                          textColor:selectedRegion==null? grey.withOpacity(0.5):grey,
+                          iconColor:selectedRegion==null? grey:yellowColor,
+                          //bgColor:userGroupName==null? disableColor:mun.isEdit?Colors.white:disableColor,
+                          bgColor:selectedRegion==null? disableColor:Colors.white,
+
+                        ),
+                      ),
+                      !userGroup?Container():ValidationErrorText(),
+
 
 
                       GestureDetector(
                         onTap: (){
+
                           if(emailController.text.isNotEmpty){
                             setState(() {
                               emailValid=EmailValidation().validateEmail(emailController.text);
                             });
+                          }
+
+                          if(phNoController.text.isEmpty){
+                            setState(() {phNo=true;});
+                          }
+                          else if(phNoController.text.length<10){
+                            setState(() {phNo=true;});
+                          }
+                          else{
+                            setState(() {phNo=false;});
                           }
 
 
@@ -367,10 +427,13 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                           if(passwordController.text.isEmpty){setState(() {password=true;});}
                           else{setState(() {password=false;});}
 
+                          if(empIdController.text.isEmpty){setState(() {empId=true;});}
+                          else{setState(() {empId=false;});}
+
                           if(userGroupId==null){setState(() {userGroup=true;});}
                           else{setState(() {userGroup=false;});}
 
-                          if(emailValid && !email && !name && !password && !userGroup){
+                          if(emailValid && !email && !name && !password && !userGroup && !phNo && !empId){
 
                             setState(() {
                               isLoad=true;
@@ -400,7 +463,7 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                                   .signUp(email: emailController.text, password: passwordController.text)
                                   .then((result) async {
                                 if (result == null) {
-
+                                  print(FirebaseAuth.instance.currentUser!.uid);
                                   if(_imageFile!=null){
                                     await firebase_storage.FirebaseStorage.instance.ref().child('propic/${AuthenticationHelper().auth2.currentUser!.uid}')
                                         .putFile(_imageFile!);
@@ -414,20 +477,23 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                                   }
 
 
-                                  databaseReference.child("Users").child("${AuthenticationHelper().auth2.currentUser!.uid}").set({
+                                 await databaseReference.child("Users").child("${FirebaseAuth.instance.currentUser!.uid}").set({
                                     'Name': nameTextController.text,
-                                    // 'PhoneNumber': phNo,
+                                    'EmployeeId': empIdController.text,
+                                     'PhoneNumber': phNoController.text,
                                     'Email':emailController.text,
                                     'Password':passwordController.text,
                                     'UserGroupId':userGroupId,
                                     'UserGroupName':userGroupName,
+                                    'RegionId':selectedRegionId,
+                                    'RegionName':selectedRegion,
                                     'imgUrl':downloadUrl,
-                                    'Uid':AuthenticationHelper().auth2.currentUser!.uid
+                                    'Uid':FirebaseAuth.instance.currentUser!.uid
 
                                   });
                                   await AuthenticationHelper().auth2.signOut();
-                                  AuthenticationHelper().signIn(email1: prefEmail,
-                                      password1: prefPassword);
+                                 await AuthenticationHelper().signIn(email1: USERDETAIL['Email'],
+                                      password1: USERDETAIL['Password']);
                                   setState(() {
                                     isLoad=false;
                                   });
@@ -475,8 +541,8 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
 
               Container(
 
-                height: userGroupOpen ? SizeConfig.screenHeight:0,
-                width: userGroupOpen ? SizeConfig.screenWidth:0,
+                height: userGroupOpen || regionOpen? SizeConfig.screenHeight:0,
+                width: userGroupOpen || regionOpen? SizeConfig.screenWidth:0,
                 color: Colors.black.withOpacity(0.5),
 
               ),
@@ -498,6 +564,28 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                 closeOnTap: (){
                   setState(() {
                     userGroupOpen=false;
+                  });
+                },
+              ),
+
+              PopUpStatic2(
+                title: "Select Region",
+                isOpen: regionOpen,
+                dataList: regionList,
+                propertyKeyName:"RegionName",
+                propertyKeyId: "RegionId",
+                selectedId: selectedRegionId,
+                itemOnTap: (index){
+                  setState(() {
+                    selectedRegion=regionList[index]['RegionName'];
+                    selectedRegionId=regionList[index]['RegionId'];
+                  //  userGroupName=userGroupList[index]['UserGroupName'];
+                    regionOpen=false;
+                  });
+                },
+                closeOnTap: (){
+                  setState(() {
+                    regionOpen=false;
                   });
                 },
               ),

@@ -621,12 +621,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               );
                             })
                     ),
-                    SizedBox(height: _height * 0.245,),
-                    Text(
-                      "@${DateFormat('yyyy').format(DateTime.now())}. All Rights Reserved. Designed by Cybertronics Pvt.Ltd",
-                      style: TextStyle(fontFamily: 'RR',  color: Colors.white,fontSize: 12 ),
 
-                    ),
+
                    // Spacer(),
                   ],
                 ),
@@ -634,6 +630,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
             Loader(
               isLoad: isLoading,
+            ),
+           _keyboardVisible?Container(): Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                "@${DateFormat('yyyy').format(DateTime.now())}. All Rights Reserved. Designed by Cybertronics Pvt.Ltd",
+                style: TextStyle(fontFamily: 'RR',  color: Colors.white,fontSize: 12 ),textAlign: TextAlign.center,
+
+              ),
             )
 
           ],

@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:cybertech/widgets/noData.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,11 @@ class MapSampleState extends State<MapSample> {
   Completer<GoogleMapController> _controller = Completer();
   List<Marker> _markers = <Marker>[];
   final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
-   late  CameraPosition _kGooglePlex;
+  CameraPosition _kGooglePlex=CameraPosition(
+     target: LatLng(13.0650125, 80.1803574),
+     zoom: 10.4746,
+   );
+  bool showShimmer=false;
 
   static final CameraPosition _kLake = CameraPosition(
       bearing: 92.8334901395799,
@@ -58,6 +63,9 @@ class MapSampleState extends State<MapSample> {
 
 
   getCurrentlocation() async {
+    setState(() {
+      showShimmer=true;
+    });
     final geoposition = await GeolocatorPlatform.instance.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
     setState(() {
       _kGooglePlex = CameraPosition(
@@ -65,9 +73,6 @@ class MapSampleState extends State<MapSample> {
         zoom: 10.4746,
       );
     });
-    print("geoposition.latitude");
-    print(geoposition.latitude);
-    print(geoposition.longitude);
   }
 
   showBottomModel(Map details,double lat,double long,String address,String time) async {
@@ -132,6 +137,9 @@ class MapSampleState extends State<MapSample> {
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               _markers.clear();
+              setState(() {
+                showShimmer=false;
+              });
               dbRef2.onValue.listen((event) {
                 if(event.snapshot.value!=null){
                   log("event.snapshot.value ${event.snapshot.value}");
@@ -146,6 +154,7 @@ class MapSampleState extends State<MapSample> {
                                     title: '${v['Name']}'
                                 ),
                                 onTap: (){
+                                  print(_markers);
                                   dbRef.child(DateFormat(dbDateFormat).format(DateTime.now())).child(k).once().then((value){
                                     if(value.value!=null){
                                       print(value.value);
@@ -186,7 +195,8 @@ class MapSampleState extends State<MapSample> {
             top: 20,
             left: 20,
             child: NavBarIcon(ontap: widget.drawerCallback),
-          )
+          ),
+          showShimmer?ShimmerWidget():Container(),
         ],
       ),
       /*   floatingActionButton: FloatingActionButton.extended(

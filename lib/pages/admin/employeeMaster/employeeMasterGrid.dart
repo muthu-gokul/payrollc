@@ -9,6 +9,7 @@ import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +88,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
             ),
             Container(
               margin: EdgeInsets.only(top: 60),
-              height: SizeConfig.screenHeight!-242,
+              height: SizeConfig.screenHeight!-70,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Wrap(

@@ -11,10 +11,12 @@ import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:cybertech/widgets/bottomBarAddButton.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/editDelete.dart';
-import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
+import 'package:cybertech/widgets/noData.dart';
+import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -150,7 +152,37 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                   ),
                   Text("  Expenses",
                     style: TextStyle(fontFamily: 'RR',fontSize: 16,color: Colors.white),
-                  )
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                      onTap: () async{
+                        final DateTime? picked = await showDatePicker2(
+                            context: context,
+                            initialDate:  date==null?DateTime.now():date!, // Refer step 1
+                            //firstDate: DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                            builder: (BuildContext context,Widget? child){
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: yellowColor, // header background color
+                                    onPrimary: Colors.white, // header text color
+                                    onSurface: grey, // body text color
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            });
+                        if (picked != null)
+                          setState(() {
+                            date = picked;
+                          });
+                        Provider.of<GeneralUserExpenseNotifier>(context,listen: false).getData(date);
+                      },
+                      child: SvgPicture.asset("assets/svg/calender.svg",color: Colors.white,height: 30,)
+                  ),
+                  SizedBox(width: 10,)
                 ],
               ),
             ),
@@ -282,12 +314,24 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                                                     padding:  EdgeInsets.only(left: 10),
                                                     decoration: BoxDecoration(
                                                       border: gridBottomborder,
-                                                      // color: widget.selectedUid==value['Uid']?yellowColor:gridBodyBgColor,
+
                                                     ),
                                                     height: 50,
                                                     width: 100,
-                                                    child: Text("${value['Status']}",
-                                                      style:gridValueTS,
+                                                    child: Container(
+                                                      padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(30),
+                                                        color: value['Status']=='Accept'?Colors.green:
+                                                        value['Status']=='Reject'?Colors.red:
+                                                        Colors.transparent,
+                                                      ),
+                                                      child: Text("${value['Status']}",
+                                                        style:TextStyle(fontFamily: 'RR',color: value['Status']=='Accept'?Colors.white:
+                                                        value['Status']=='Reject'?Colors.white:
+                                                            grey,
+                                                            fontSize: 14),
+                                                      ),
                                                     ),
                                                   ),
                                                   Container(
@@ -299,7 +343,7 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                                                     ),
                                                     height: 50,
                                                     width: 150,
-                                                    child: Text("${value['ClaimedAmount']==null?0.0:value['ClaimedAmount']}",
+                                                    child: Text("${value['AcceptedExpenseValue']==null?0.0:value['AcceptedExpenseValue']}",
                                                       style:gridValueTS,
                                                     ),
                                                   ),
@@ -415,7 +459,7 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                       ),
 
 
-
+                      not.lists.isEmpty?NoData():Container()
 
 
 

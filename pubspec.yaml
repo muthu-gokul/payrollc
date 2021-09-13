@@ -48,6 +48,7 @@ dependencies:
   location_permissions:
   background_locator:
   english_words:
+  shimmer:
   geocoder:
     path: ./flutter_geocoder-master
   month_picker_dialog:

@@ -7,6 +7,7 @@ import 'package:cybertech/pages/admin/serviceReport/serviceReportUsersList.dart'
 import 'package:cybertech/pages/admin/siteAssign/siteEmployeeGrid.dart';
 import 'package:cybertech/pages/admin/siteMaster/siteMasterGrid.dart';
 import 'package:cybertech/pages/generalUser/generalUserHomePage.dart';
+import 'package:cybertech/pages/generalUser/profile/generalUserEditProfile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -117,6 +118,17 @@ class _AdminHomePageState extends State<AdminHomePage> {
                   }
               ),
               DrawerContent(
+                  title: "Profile",
+                  img: 'assets/svg/user.svg',
+                  isPng: false,
+                  ontap: (){
+                    setState(() {
+                      menuSel=8;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
+              DrawerContent(
                   title: "Logout",
                   img: 'assets/images/nav/logout.png',
                   ontap: (){
@@ -157,7 +169,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
         }):
         menuSel==7?ExpenseReportEmployeeList(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
-        }):Container(),
+        }):
+        menuSel==8?GeneralUsesEditProfile(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        Container(),
       ),
     );
   }

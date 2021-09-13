@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 
 import 'attendance/generalUserAttendance.dart';
 import 'dailyAssignedSites/generalUserDailySites.dart';
+import 'profile/generalUserEditProfile.dart';
 
 class GeneralHomePage extends StatefulWidget {
   @override
@@ -137,6 +138,17 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
                     scaffoldKey.currentState!.openEndDrawer();
                   }
               ),
+              DrawerContent(
+                  title: "Profile",
+                  img: 'assets/svg/user.svg',
+                  isPng: false,
+                  ontap: (){
+                    setState(() {
+                      menuSel=4;
+                    });
+                    scaffoldKey.currentState!.openEndDrawer();
+                  }
+              ),
         /*      DrawerContent(
                   title: "Site Master",
                   ontap: (){
@@ -193,6 +205,9 @@ class _GeneralHomePageState extends State<GeneralHomePage> with WidgetsBindingOb
           scaffoldKey.currentState!.openDrawer();
         }):
         menuSel==3?GeneralUserExpenseGrid(drawerCallback: (){
+          scaffoldKey.currentState!.openDrawer();
+        }):
+        menuSel==4?GeneralUsesEditProfile(drawerCallback: (){
           scaffoldKey.currentState!.openDrawer();
         }): Container(),
       ),

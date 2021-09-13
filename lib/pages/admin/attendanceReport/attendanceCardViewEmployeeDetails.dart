@@ -82,16 +82,19 @@ class _AttendanceCardViewEmpDetailsState extends State<AttendanceCardViewEmpDeta
                   itemBuilder: (ctx,i){
                     return GestureDetector(
                       onTap: (){
-                        if(selIndex==i){
-                          setState(() {
-                            selIndex=-1;
-                          });
+                        if(widget.details['Details'][i]['Attendance']!='A'){
+                          if(selIndex==i){
+                            setState(() {
+                              selIndex=-1;
+                            });
+                          }
+                          else{
+                            setState(() {
+                              selIndex=i;
+                            });
+                          }
                         }
-                        else{
-                          setState(() {
-                            selIndex=i;
-                          });
-                        }
+
                         print( widget.details['Details'][i]);
                       //  print( widget.details['Details'][i][0]);
                       },

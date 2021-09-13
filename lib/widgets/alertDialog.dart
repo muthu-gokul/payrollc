@@ -471,6 +471,30 @@ class CustomAlert{
     );
   }
 
+  void cupertinoDialogYesNo(BuildContext context,String title){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => CupertinoAlertDialog(
+          content: Text("$title",style: TextStyle(fontSize: 18),),
+          actions: [
+            CupertinoDialogAction(
+              child: Text("Yes"),
+              onPressed: (){
+                callback!();
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text("No"),
+              onPressed: (){
+                Navigator.pop(ctx);
+              },
+            ),
+          ],
+        )
+    );
+  }
+
   void cupertinoAlertDialog(BuildContext context,String title){
     showDialog(
         context: context,

@@ -7,6 +7,7 @@ import 'package:cybertech/pages/admin/serviceReport/serviceReportAssignedSites.d
 import 'package:cybertech/widgets/grid/gridWithWidgetParam.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:cybertech/widgets/noData.dart';
 import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
 
 
   List<dynamic> lists=[];
-
+  bool showShimmer=false;
   //List<dynamic> siteList2=[];
   Map siteList2={};
   Map data={};
@@ -45,7 +46,11 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
 
   @override
   void initState() {
-    date=DateTime.now();
+    setState(() {
+      date=DateTime.now();
+
+    });
+
    getData(date);
 /*    dbRef.onValue.listen((event) {
       lists.clear();
@@ -64,6 +69,9 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
   }
 
   getData(DateTime? date){
+    setState(() {
+      showShimmer=true;
+    });
     dbRef.child(DateFormat(dbDateFormat).format(date!)).once().then((value){
       log("EXPENSES ${value.value}");
       lists.clear();
@@ -77,10 +85,14 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
             lists.add(v);
           });
         });
-
+        setState(() {
+          showShimmer=false;
+        });
       }
       else{
-
+        setState(() {
+          showShimmer=false;
+        });
       }
     });
   }
@@ -199,7 +211,14 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
                         i,InkWell(
                       onTap: (){
                         print(value);
-                        Navigator.push(context, MaterialPageRoute(builder: (ctx)=>ExpenseReportDetailView(expensesList: value['ExpensesList'])));
+                        Navigator.push(context, MaterialPageRoute(builder: (ctx)=>ExpenseReportDetailView(
+                            expensesList: value['ExpensesList'],
+                            date: DateFormat(dbDateFormat).format(date!),
+                            uid: value['UserDetail']['Uid'],
+                            voidCallback: (){
+                              getData(date);
+                            },
+                        )));
                         //setState(() {});
                       },
                       child: Container(
@@ -247,15 +266,8 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
                 )
             ),
 
-            Positioned(
-              bottom: 0,
-              child: RaisedButton(onPressed: (){
-             //   log("${lists}");
-                print(lists.length);
-                log("${lists[0]}");
-                print(data.length);
-              }),
-            )
+            lists.isEmpty?NoData():Container(),
+            showShimmer?ShimmerWidget():Container(),
           ],
         ),
       ),
