@@ -11,9 +11,11 @@ import 'package:cybertech/widgets/arrowBack.dart';
 import 'package:cybertech/widgets/bottomBarAddButton.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/customTextField.dart';
+import 'package:cybertech/widgets/expectedDateContainer.dart';
 import 'package:cybertech/widgets/loader.dart';
 import 'package:cybertech/widgets/popOver/src/popover.dart';
 import 'package:cybertech/widgets/popOver/src/popover_direction.dart';
+import 'package:cybertech/widgets/singleDatePicker.dart';
 import 'package:cybertech/widgets/validationErrorText.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -217,6 +219,43 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                         ),
                       ),
                       !v_site?Container():ValidationErrorText(),
+
+                      GestureDetector(
+                        onTap: () async{
+                          final DateTime? picked = await showDatePicker2(
+                              context: context,
+                              initialDate: DateTime.now(), // Refer step 1
+                              firstDate:  DateTime.now().subtract(Duration(days:  DateTime.now().weekday - 1)),
+                              lastDate: DateTime.now(),
+                              builder: (BuildContext context,Widget? child){
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                      primary:yellowColor, // header background color
+                                      onPrimary: bgColor, // header text color
+                                      onSurface: grey, // body text color
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              });
+
+
+
+                          if (picked != null)
+                            setState(() {
+                        //      dn.DP_billDate = picked;
+
+                            });
+                        },
+                        child: ExpectedDateContainer(
+                          //  text: DateFormat("yyyy-MM-dd").format(dn.DP_billDate)==DateFormat("yyyy-MM-dd").format(DateTime.now())?"Select Bill Date":"${DateFormat.yMMMd().format(dn.DP_billDate)}",
+                        //  text:dn.DP_billDate==null?"Select Bill Date": "${DateFormat.yMMMd().format(dn.DP_billDate!)}",
+                          text:"Select Bill Date",
+                          textColor:grey,
+                          // textColor:DateFormat("yyyy-MM-dd").format(dn.DP_billDate)==DateFormat("yyyy-MM-dd").format(DateTime.now())? AppTheme.addNewTextFieldText.withOpacity(0.5):AppTheme.addNewTextFieldText,
+                        ),
+                      ),
 
                       images!.isEmpty?Container():Container(
                         height: 220,
