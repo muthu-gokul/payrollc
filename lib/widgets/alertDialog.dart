@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cybertech/constants/size.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -15,7 +16,16 @@ class CustomAlert{
   VoidCallback? Cancelcallback;
   CustomAlert({this.callback,this.Cancelcallback});
 
-
+  toast(String msg){
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
 
   void selectTableAlert(BuildContext context,String img,String title){
     showDialog(

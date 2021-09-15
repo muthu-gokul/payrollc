@@ -552,6 +552,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                         setState(() {
                           isLoad=false;
                         });
+                        CustomAlert().toast("Logged In Successfully..");
                       }
                       else{
                         CustomAlert().cupertinoAlertDialog(context, "Already Logged In...", );
@@ -582,6 +583,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                             setState(() {
                               isLoad=false;
                             });
+                            CustomAlert().toast("Logged Out Successfully..");
                           });
                         }
                         else{
@@ -600,6 +602,7 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
                           setState(() {
                             isLoad=false;
                           });
+                          CustomAlert().toast("Logged Out Successfully..");
                         }
                       }
                       else{

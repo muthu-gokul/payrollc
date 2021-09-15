@@ -49,6 +49,7 @@ dependencies:
   background_locator:
   fluttertoast:
   shimmer:
+  excel:
   geocoder:
     path: ./flutter_geocoder-master
   month_picker_dialog:

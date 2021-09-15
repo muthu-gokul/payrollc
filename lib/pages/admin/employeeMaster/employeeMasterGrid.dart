@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cybertech/api/authentication.dart';
 import 'package:cybertech/constants/constants.dart';
@@ -10,10 +13,12 @@ import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:cybertech/widgets/noData.dart';
+import 'package:excel/excel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EmployeeMasterGrid extends StatefulWidget {
   VoidCallback drawerCallback;
@@ -230,7 +235,69 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
 
                         ],
                       ),
-                    )
+                    ),
+                    Container(
+                      width:  SizeConfig.screenWidth,
+                      height: 80,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 20,),
+                          GestureDetector(
+                              onTap:() async {
+                              //  log("$employees");
+
+                                if(employees.isEmpty){
+                                  CustomAlert().cupertinoAlertDialog(context, "No Data");
+                                }
+                                else{
+                                  var excel = Excel.createExcel();
+                                  Sheet sheetObject = excel['Employee Detail'];
+                                  excel.delete('Sheet1');
+                                  CellStyle cellStyle = CellStyle( fontFamily : getFontFamily(FontFamily.Calibri),bold: true);
+                                  List<String?> header=['EmployeeId','Name','Email','Region Name','Phone Number','UserGroup Name'];
+                                  int ascii=65;
+                                  header.forEach((element) {
+                                    var cell = sheetObject.cell(CellIndex.indexByString("${String.fromCharCode(ascii)}1"));
+                                    cell.cellStyle = cellStyle;
+                                    ascii++;
+                                  });
+                                  sheetObject.insertRowIterables(header, 0,);
+
+                                  List<String> body=[];
+                                  int i=0;
+                                  employees.forEach((key, value) {
+                                    body.clear();
+                                    body.add(value['EmployeeId']??"");
+                                    body.add(value['Name']??"");
+                                    body.add(value['Email']??"");
+                                    body.add(value['RegionName']??"");
+                                    body.add(value['PhoneNumber']??"");
+                                    body.add(value['UserGroupName']??"");
+                                    sheetObject.insertRowIterables(body, i+1,);
+                                    i++;
+                                  });
+
+
+                                  final String dirr ='/storage/emulated/0/Download';
+                                  String filename="EmployeeDetail${DateTime.now().toString()}";
+                                  //   await Directory('/storage/emulated/0/Download').create(recursive: true);
+                                  final String path = '$dirr/$filename.xlsx';
+
+
+                                  final File file = File(path);
+                                  await file.writeAsBytes(await excel.encode()!).then((value) async {
+                                    CustomAlert().billSuccessAlert(context, "", "Successfully Downloaded @ \n\n Internal Storage/Download/$filename.xlsx", "", "");
+                                  });
+                                }
+
+
+
+                              },
+                              child: SvgPicture.asset("assets/svg/excel.svg",height: 30,)
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

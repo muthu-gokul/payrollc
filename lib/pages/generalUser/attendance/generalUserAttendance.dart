@@ -362,15 +362,8 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                                 'LoginTime':DateTime.now().toString(),
                                 'LoginAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
                               }).then((value){
-                                Fluttertoast.showToast(
-                                    msg: "Logged In Successfully..",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                //    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
+                                CustomAlert().toast("Logged In Successfully..");
+
                               });
                             }
                             else{
