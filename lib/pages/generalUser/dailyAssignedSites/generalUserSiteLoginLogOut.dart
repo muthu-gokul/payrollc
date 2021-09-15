@@ -30,8 +30,8 @@ class _GeneralUserSiteLoginLogOutState extends State<GeneralUserSiteLoginLogOut>
   int pageIndex=0;
   bool isEmployeeLogin=true;
   Map siteDetails={};
-  final dbRef=FirebaseDatabase.instance.reference().child("SiteAssign").child(DateFormat(dbDateFormat).format(DateTime.now())).child(USERDETAIL['Uid']);
-  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
+  final dbRef=databaseReference.child("SiteAssign").child(DateFormat(dbDateFormat).format(DateTime.now())).child(USERDETAIL['Uid']);
+  final dbRef2=databaseReference.child("TrackUsers").child(USERDETAIL['Uid']);
 
   bool isLoad=false;
   final picker = ImagePicker();

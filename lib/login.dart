@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'api/authentication.dart';
 import 'constants/size.dart';
 import 'notifier/timeNotifier.dart';
+import 'pages/admin/employeeMaster/employeeMasterAddNEw.dart';
 import 'pages/generalUser/generalUserHomePage.dart';
 import 'widgets/alertDialog.dart';
 import 'widgets/loader.dart';
@@ -318,7 +319,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       },
                     ),*/
                     SizedBox(height: _height * 0.19,),
-
                   //  SvgPicture.asset("assets/svg/logo.svg",height: 100,),
                     SizedBox(height: 20,),
                     Form(
@@ -358,28 +358,38 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                  _addUserDetail(username.text, password.text,AuthenticationHelper().user.uid);
                                                  usersRef.child(AuthenticationHelper().user.uid).once().then((value){
                                                    print(value.value);
-                                                   setState(() {
-                                                     USERDETAIL=value.value;
-                                                   });
-                                                   if(USERDETAIL['UserGroupId']==1){
+                                                   if(value.value!=null){
+                                                     setState(() {
+                                                       USERDETAIL=value.value;
+                                                     });
+                                                     if(USERDETAIL['UserGroupId']==1){
+                                                       setState(() {
+                                                         isLoading=false;
+                                                       });
+                                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                                     }
+                                                     if(USERDETAIL['UserGroupId']==2){
+                                                       initPlatformState();
+                                                       Provider.of<LocationNotifier>(context,listen: false).listenLocation();
+                                                       databaseReference.child("TrackUsers").child(USERDETAIL['Uid']).set({
+                                                         'lat':"null",
+                                                         'long':"null",
+                                                         'Name':USERDETAIL['Name']
+                                                       });
+                                                       setState(() {
+                                                         isLoading=false;
+                                                       });
+                                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
+                                                     }
+                                                   }
+                                                   else{
                                                      setState(() {
                                                        isLoading=false;
                                                      });
-                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHomePage()));
+                                                     CustomAlert().cupertinoAlertDialog(context,"User doesn't exists..");
                                                    }
-                                                   if(USERDETAIL['UserGroupId']==2){
-                                                     initPlatformState();
-                                                     Provider.of<LocationNotifier>(context,listen: false).listenLocation();
-                                                     FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']).set({
-                                                       'lat':"null",
-                                                       'long':"null",
-                                                       'Name':USERDETAIL['Name']
-                                                     });
-                                                     setState(() {
-                                                       isLoading=false;
-                                                     });
-                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeneralHomePage()));
-                                                   }
+
+
                                                  });
 
 
@@ -633,10 +643,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
            _keyboardVisible?Container(): Align(
               alignment: Alignment.bottomCenter,
-              child: Text(
-                "@${DateFormat('yyyy').format(DateTime.now())}. All Rights Reserved. Designed by Cybertronics Pvt.Ltd",
-                style: TextStyle(fontFamily: 'RR',  color: Colors.white,fontSize: 12 ),textAlign: TextAlign.center,
+              child: InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (ctx)=>EmployeeMasterAddNew(
+                    isEdit: false,
+                    value: {},
+                  )));
+                },
+                child: Text(
+                  "@${DateFormat('yyyy').format(DateTime.now())}. All Rights Reserved. Designed by Cybertronics Pvt.Ltd",
+                  style: TextStyle(fontFamily: 'RR',  color: Colors.white,fontSize: 12 ),textAlign: TextAlign.center,
 
+                ),
               ),
             )
 

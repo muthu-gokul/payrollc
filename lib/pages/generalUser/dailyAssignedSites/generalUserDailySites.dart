@@ -33,9 +33,9 @@ class GeneralUserDailySites extends StatefulWidget {
 }
 
 class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
-  final dbRef = FirebaseDatabase.instance.reference().child("Users").orderByChild("UserGroupId").equalTo(2);
-  final dbRef2 = FirebaseDatabase.instance.reference().child("SiteDetail");
-  final dbRef3 = FirebaseDatabase.instance.reference().child("SiteAssign");
+  final dbRef = databaseReference.child("Users").orderByChild("UserGroupId").equalTo(2);
+  final dbRef2 = databaseReference.child("SiteDetail");
+  final dbRef3 = databaseReference.child("SiteAssign");
   List<dynamic> lists=[];
   late List<dynamic> siteList;
   int selectedIndex=-1;
@@ -315,7 +315,7 @@ class _GeneralUserDailySitesState extends State<GeneralUserDailySites> {
                               CustomAlert(
                                   callback: (){
                                     AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                      FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
+                                      databaseReference.child("Users").child(selectedUid).remove().then((value) async {
                                         await AuthenticationHelper().user.delete();
                                         AuthenticationHelper().signIn(email1: prefEmail,
                                             password1: prefPassword);

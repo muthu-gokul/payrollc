@@ -492,8 +492,11 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
 
                                   });
                                   await AuthenticationHelper().auth2.signOut();
-                                 await AuthenticationHelper().signIn(email1: USERDETAIL['Email'],
-                                      password1: USERDETAIL['Password']);
+                                  if(USERDETAIL['Email']!=null){
+                                    await AuthenticationHelper().signIn(email1: USERDETAIL['Email'],
+                                        password1: USERDETAIL['Password']);
+                                  }
+
                                   setState(() {
                                     isLoad=false;
                                   });
@@ -525,7 +528,9 @@ class _EmployeeMasterAddNewState extends State<EmployeeMasterAddNew> {
                           ),
                           child:Center(child: Text('Done',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,
                         ),
-                      )
+                      ),
+
+                      SizedBox(height: 50,)
                     ],
                   ),
 

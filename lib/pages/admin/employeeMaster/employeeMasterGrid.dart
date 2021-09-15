@@ -9,6 +9,7 @@ import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:cybertech/widgets/noData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,13 +24,14 @@ class EmployeeMasterGrid extends StatefulWidget {
 }
 
 class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
-  final dbRef = FirebaseDatabase.instance.reference().child("Users");
+  final dbRef = databaseReference.child("Users");
   List<dynamic> lists=[];
   int selectedIndex=-1;
   String selectedUid="";
   dynamic selectedValue={};
   Map employees={};
   bool showEdit=false;
+  bool isLoad=false;
   List<ReportGridStyleModel2> reportsGridColumnNameList=[
     ReportGridStyleModel2(columnName: "Name"),
     ReportGridStyleModel2(columnName: "Email"),
@@ -42,6 +44,9 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
   void initState() {
     dbRef.onValue.listen((event) {
    //   lists.clear();
+      setState(() {
+        isLoad=true;
+      });
       employees.clear();
       DataSnapshot dataValues = event.snapshot;
       if(dataValues.value!=null){
@@ -49,6 +54,12 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
         print("LIST CLESR $values");
         setState(() {
           employees=values;
+          isLoad=false;
+        });
+      }
+      else{
+        setState(() {
+          isLoad=false;
         });
       }
 
@@ -140,33 +151,6 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                 ),
               ),
             ),
-            /*ReportDataTable2(
-              topMargin: 55,
-              gridBodyReduceHeight: 150,
-              selectedIndex: selectedIndex,
-              selectedUid: selectedUid,
-              gridData: lists,
-              gridDataRowList: reportsGridColumnNameList,
-              func: (uid,value){
-
-                if(selectedUid==uid){
-                  setState(() {
-                    selectedUid="";
-                    selectedValue={};
-                    showEdit=false;
-                  });
-
-                }
-                else{
-                  setState(() {
-                    selectedUid=uid;
-                    selectedValue=value;
-                    showEdit=true;
-
-                  });
-                }
-              },
-            ),*/
 
 
             //bottomNav
@@ -227,7 +211,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                               CustomAlert(
                                 callback: (){
                                   AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                    FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
+                                    databaseReference.child("Users").child(selectedUid).remove().then((value) async {
                                      await AuthenticationHelper().user.delete();
                                      AuthenticationHelper().signIn(email1: prefEmail,
                                          password1: prefPassword);
@@ -265,6 +249,7 @@ class _EmployeeMasterGridState extends State<EmployeeMasterGrid> {
                 )
             ),
 
+            isLoad?ShimmerWidget(topMargin: 70,):Container(),
           ],
         ),
       ),

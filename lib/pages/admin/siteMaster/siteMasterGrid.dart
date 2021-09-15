@@ -10,6 +10,7 @@ import 'package:cybertech/widgets/bottomPainter.dart';
 import 'package:cybertech/widgets/editDelete.dart';
 import 'package:cybertech/widgets/grid/reportDataTableWithoutModel.dart';
 import 'package:cybertech/widgets/navigationBarIcon.dart';
+import 'package:cybertech/widgets/noData.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ class SiteMasterGrid extends StatefulWidget {
 }
 
 class _SiteMasterGridState extends State<SiteMasterGrid> {
-  final dbRef = FirebaseDatabase.instance.reference().child("SiteDetail");
+  final dbRef = databaseReference.child("SiteDetail");
   List<dynamic> lists=[];
   int selectedIndex=-1;
   String selectedUid="";
@@ -113,7 +114,7 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
               height: SizeConfig.screenHeight!-200,
               width: SizeConfig.screenWidth,
               margin: EdgeInsets.only(top: 110),
-              child: lists.isEmpty? Text("No Data"):ListView.builder(
+              child: lists.isEmpty? NoData(height: 100,):ListView.builder(
                 itemCount: lists.length,
                 itemBuilder: (ctx,i){
                   return  Container(
@@ -208,7 +209,7 @@ class _SiteMasterGridState extends State<SiteMasterGrid> {
                               CustomAlert(
                                   callback: (){
                                     AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                      FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
+                                      databaseReference.child("Users").child(selectedUid).remove().then((value) async {
                                         await AuthenticationHelper().auth2.currentUser!.delete();
                                         AuthenticationHelper().signIn(email1: prefEmail,
                                             password1: prefPassword);

@@ -25,7 +25,7 @@ class MapSampleState extends State<MapSample> {
 
   Completer<GoogleMapController> _controller = Completer();
   List<Marker> _markers = <Marker>[];
-  final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
+  final dbRef = databaseReference.child("Attendance");
   CameraPosition _kGooglePlex=CameraPosition(
      target: LatLng(13.0650125, 80.1803574),
      zoom: 10.4746,
@@ -38,7 +38,7 @@ class MapSampleState extends State<MapSample> {
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
 
-  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers");
+  final dbRef2=databaseReference.child("TrackUsers");
   @override
   void initState() {
     getCurrentlocation();

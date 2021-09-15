@@ -15,6 +15,7 @@ import 'package:cybertech/widgets/navigationBarIcon.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 
 import 'package:intl/intl.dart';
@@ -43,9 +44,9 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
   StreamSubscription<LocationData>? _locationSubscription;
   String? _error;*/
 
-  final dbRef = FirebaseDatabase.instance.reference().child("Attendance");
+  final dbRef = databaseReference.child("Attendance");
   var first;
-  final dbRef2=FirebaseDatabase.instance.reference().child("TrackUsers").child(USERDETAIL['Uid']);
+  final dbRef2=databaseReference.child("TrackUsers").child(USERDETAIL['Uid']);
 
   Map currentDayInfo={};
   getCurrentDayInfo(){
@@ -360,7 +361,16 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                                 'longi':locNot.locationData!.longitude,
                                 'LoginTime':DateTime.now().toString(),
                                 'LoginAddress':"${locNot.first.featureName} : ${locNot.first.addressLine}"
-
+                              }).then((value){
+                                Fluttertoast.showToast(
+                                    msg: "Logged In Successfully..",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                //    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
                               });
                             }
                             else{
@@ -433,7 +443,7 @@ class _GeneralUserAttendanceState extends State<GeneralUserAttendance> with Widg
                               // boxShadow: [
                               //   BoxShadow(color: Colors.green, spreadRadius: 3),
                               // ],
-                              color: Colors.indigoAccent,
+                              color: Colors.red,
                             ),
                             child:Center(child: Text('LogOut',
                               style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Color(0xffffffff),fontFamily:'RR'), )) ,

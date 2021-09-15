@@ -521,7 +521,7 @@ class _GeneralUserExpenseGridState extends State<GeneralUserExpenseGrid> {
                             /*  CustomAlert(
                                   callback: (){
                                     AuthenticationHelper().signIn(email1: selectedValue['Name'], password1: selectedValue['Password']).then((value){
-                                      FirebaseDatabase.instance.reference().child("Users").child(selectedUid).remove().then((value) async {
+                                      databaseReference.child("Users").child(selectedUid).remove().then((value) async {
                                         await AuthenticationHelper().auth2.currentUser!.delete();
                                         AuthenticationHelper().signIn(email1: prefEmail,
                                             password1: prefPassword);

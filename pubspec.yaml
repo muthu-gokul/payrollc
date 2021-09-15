@@ -47,7 +47,7 @@ dependencies:
   cached_network_image:
   location_permissions:
   background_locator:
-  english_words:
+  fluttertoast:
   shimmer:
   geocoder:
     path: ./flutter_geocoder-master

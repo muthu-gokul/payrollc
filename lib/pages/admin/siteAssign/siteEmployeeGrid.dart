@@ -24,9 +24,9 @@ class SiteEmployeeGrid extends StatefulWidget {
 }
 
 class _SiteEmployeeGridState extends State<SiteEmployeeGrid> {
-  final dbRef = FirebaseDatabase.instance.reference().child("Users").orderByChild("UserGroupId").equalTo(2);
-  final dbRef2 = FirebaseDatabase.instance.reference().child("SiteDetail");
-  final dbRef3 = FirebaseDatabase.instance.reference().child("SiteAssign");
+  final dbRef = databaseReference.child("Users").orderByChild("UserGroupId").equalTo(2);
+  final dbRef2 = databaseReference.child("SiteDetail");
+  final dbRef3 = databaseReference.child("SiteAssign");
   List<dynamic> lists=[];
   List<dynamic> siteList=[];
   int selectedIndex=-1;

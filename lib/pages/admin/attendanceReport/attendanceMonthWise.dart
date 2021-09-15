@@ -43,16 +43,7 @@ class _AttendanceOverViewState extends State<AttendanceOverView> {
     AttendanceMonthGridStyleModel(columnName: "9",width: attWidth),
     AttendanceMonthGridStyleModel(columnName: "10",width: attWidth),*/
   ];
-  List<dynamic> data=[
-    {"Employee Name":"Bala","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Muthu","1":"PN","2":"PN","3":"AB","4":"PN","5":"AB","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Vivek","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Ramesh","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Rajasekar","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Lavanya","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Aishwarya","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-    {"Employee Name":"Kalaivanan","1":"PN","2":"PN","3":"AB","4":"PN","5":"PN","6":"PN","7":"PN","8":"PN","9":"PN","10":"PN",},
-  ];
+  List<dynamic> data=[];
 
   List<dynamic> users=[];
   @override

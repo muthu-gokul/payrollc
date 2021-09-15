@@ -15,39 +15,7 @@ class CustomAlert{
   VoidCallback? Cancelcallback;
   CustomAlert({this.callback,this.Cancelcallback});
 
-  // void show(BuildContext context,String text,int duration){
-  //  showDialog(
-  //    barrierDismissible: true,
-  //     context: context,
-  //     builder: (ctx) {
-  //       Future.delayed(Duration(milliseconds: duration), () {
-  //         Navigator.of(context).pop(true);
-  //       });
-  //      return Scaffold(
-  //        backgroundColor: Colors.transparent,
-  //        body: Center(
-  //          child: GestureDetector(
-  //            onTap: (){
-  //              // Navigator.of(ctx).pop(true);
-  //            },
-  //            child: Container(
-  //              height: 500,
-  //              width: SizeConfig.screenWidth*0.8,
-  //              decoration: BoxDecoration(
-  //                borderRadius: BorderRadius.circular(10),
-  //                color: Colors.black.withOpacity(0.3)
-  //              ),
-  //              child: Center(
-  //                  child: Text(text,style: TextStyle(color: Colors.white,fontSize: 100,fontFamily: 'QR'),textAlign: TextAlign.center,)
-  //              ),
-  //
-  //             ),
-  //          ),
-  //        ),
-  //      );
-  //     }
-  //   );
-  // }
+
 
   void selectTableAlert(BuildContext context,String img,String title){
     showDialog(

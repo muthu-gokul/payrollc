@@ -5,7 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NoData extends StatelessWidget {
-
+  double? height;
+  NoData({this.height=150.0});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -14,7 +15,7 @@ class NoData extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 150,),
+          SizedBox(height: height,),
           Text("No Data Found",style: TextStyle(fontSize: 18,fontFamily:'RMI',color: grey),),
           SvgPicture.asset("assets/nodata.svg",height: 350,),
 
@@ -27,7 +28,8 @@ class NoData extends StatelessWidget {
 
 
 class ShimmerWidget extends StatelessWidget {
-
+  double? topMargin;
+  ShimmerWidget({this.topMargin=0.0});
   late double width,height;
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class ShimmerWidget extends StatelessWidget {
         color: Colors.white,
       ),
       padding: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: topMargin!),
       child:ListView.builder(
         itemCount: 3,
         itemBuilder: (_,__){
@@ -93,6 +96,8 @@ class ShimmerWidget extends StatelessWidget {
                   Container(
                     height: 180,
                     width: width*0.4,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
