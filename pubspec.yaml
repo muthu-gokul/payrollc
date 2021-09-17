@@ -50,6 +50,8 @@ dependencies:
   fluttertoast:
   shimmer:
   excel:
+  pdf:
+  http:
   geocoder:
     path: ./flutter_geocoder-master
   month_picker_dialog:
