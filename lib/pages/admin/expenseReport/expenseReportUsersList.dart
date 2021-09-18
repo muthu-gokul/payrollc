@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/constants/size.dart';
 import 'package:cybertech/pages/admin/expenseReport/expenseReportPdf.dart';
+import 'package:cybertech/pages/admin/expenseReport/expenseReportPdf2.dart';
 import 'package:cybertech/pages/admin/expenseReport/expensesReportInnerList.dart';
 import 'package:cybertech/pages/admin/serviceReport/serviceReportAssignedSites.dart';
 import 'package:cybertech/widgets/bottomPainter.dart';
@@ -347,7 +348,8 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
 
                                 });
 
-                                checkpdf(context, DateFormat("dd/MM/yyyy").format(date!),lists);
+                                //checkpdf(context, DateFormat("dd/MM/yyyy").format(date!),lists);
+                                checkpdf2(context, DateFormat("dd/MM/yyyy").format(date!),lists);
 
                                   // lists.forEach((element) {
                                   //   print("hh");

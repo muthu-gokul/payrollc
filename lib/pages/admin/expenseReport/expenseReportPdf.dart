@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cybertech/constants/constants.dart';
 import 'package:cybertech/widgets/alertDialog.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import 'package:pdf/pdf.dart';
 import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
@@ -29,24 +30,99 @@ checkpdf(context,String date,List<dynamic> data) async {
     });
   });
   log("DATA $data");*/
+var tempExpse=data[0]['ExpensesList'] as Map;
+log("tempExpse${tempExpse.length} $tempExpse");
 
  pw.TextStyle boldTS12=pw.TextStyle(fontSize: 12,fontWeight: pw.FontWeight.bold);
  pw.TextStyle normalTS12=pw.TextStyle(fontSize: 12,fontWeight: pw.FontWeight.normal);
 
   List<int> temp=List.generate(60, (index) => index);
- final List<pw.Widget> tempWidget = temp.map((image) {
-   return pw.Padding(
-       padding: pw.EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-           child: pw.Column(
-           crossAxisAlignment: pw.CrossAxisAlignment.center,
-           mainAxisSize: pw.MainAxisSize.max,
-           children: [
-             pw.Text("${image}"),
-           ]
-           )
-         );
- }).toList();
- //create a list of card
+  final List<pw.Widget> tempWidget = temp.map((image) {
+    return pw.Padding(
+        padding: pw.EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            mainAxisSize: pw.MainAxisSize.max,
+            children: [
+              pw.Text("${image}"),
+            ]
+        )
+    );
+  }).toList();
+
+
+final List<pw.Widget> tempWidget2= tempExpse.map((key, image) => MapEntry(key,
+    Container(
+  //   height: 220,
+  //  width: 100,
+  margin: EdgeInsets.fromLTRB(20,20,20,20),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(10),
+    //  border: Border.all(color: Colors.grey),
+    //  color: Colors.white,
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        height: 40,
+        alignment: Alignment.center,
+        //   color: Colors.grey,
+        child: Text("${image['SiteName']}",style: boldTS12,),
+      ),
+      RichText(
+        text: TextSpan(
+          text: ' Expense Name:  ',
+          style: boldTS12,
+          children: <TextSpan>[
+            TextSpan(text: '${image['ExpenseName']}', style: normalTS12),
+          ],
+        ),
+      ),
+
+      SizedBox(height: 3,),
+      RichText(
+        text: TextSpan(
+          text: ' Expense Value:  ',
+          style: boldTS12,
+          children: <TextSpan>[
+            TextSpan(text: '${image['ExpenseValue']}', style: normalTS12),
+          ],
+        ),
+      ),
+      SizedBox(height: 3,),
+      RichText(
+        text: TextSpan(
+          text: ' Accepted Expense Value:  ',
+          style: boldTS12,
+          children: <TextSpan>[
+            TextSpan(text: '${image['AcceptedExpenseValue']??0}', style: normalTS12),
+          ],
+        ),
+      ),
+      SizedBox(height: 3,),
+      RichText(
+        text: TextSpan(
+          text: ' Rejected Expense Value:  ',
+          style: boldTS12,
+          children: <TextSpan>[
+            TextSpan(text: '${image['RejectedExpenseValue']??0}', style: normalTS12),
+          ],
+        ),
+      ),
+
+      Column(
+        children: tempWidget
+      )
+    ],
+  ),
+
+)
+)
+).values.toList();
+
+
+// create a list of card
  final List<pw.Widget> images = data.map((image) {
    return pw.Padding(
        padding: pw.EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -81,11 +157,7 @@ checkpdf(context,String date,List<dynamic> data) async {
              ),
              pw.SizedBox(height: 20),
 
-
-
-
-
-             /* pw.ListView.builder(
+              pw.ListView.builder(
                  itemBuilder: (ctx,index){
                    var key=image['ExpensesList'].keys.elementAt(index);
                    return Container(
@@ -150,8 +222,7 @@ checkpdf(context,String date,List<dynamic> data) async {
                          //     Image(pw.MemoryImage( data[i]['ExpensesList'][key]['Img'][imageIndex]),height: 200)
 
 
-                      */
-             /*   ListView.builder(
+                       /*   ListView.builder(
                              itemBuilder: (c,imageIndex)  {
                                // return img(data[i]['ExpensesList'][key]['Images'][imageIndex]);
 
@@ -159,7 +230,6 @@ checkpdf(context,String date,List<dynamic> data) async {
                              },
                              itemCount: image['ExpensesList'][key]['Img'].length
                          )*/
-             /*
                          //    SizedBox(height: 20,),
 
                        ],
@@ -168,12 +238,13 @@ checkpdf(context,String date,List<dynamic> data) async {
                    );
                  },
                  itemCount: image['ExpensesList'].length
-             )*/
+             )
            ]
        )
    );
  }).toList();
 
+  List<Widget> list=[];
 
   final pw.Document pdf = pw.Document();
   pdf.addPage(
@@ -199,8 +270,14 @@ checkpdf(context,String date,List<dynamic> data) async {
 
           pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.center,
-              mainAxisSize: pw.MainAxisSize.max,
-              children: tempWidget
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    mainAxisSize: pw.MainAxisSize.min,
+                  children: tempWidget
+                )
+              ]
           ),
 
           /*for(int i=0;i<data.length;i++)
@@ -510,7 +587,8 @@ checkpdf(context,String date,List<dynamic> data) async {
 
   final File file = File(path);
   await file.writeAsBytes(await pdf.save()).then((value) async {
-    CustomAlert().billSuccessAlert(context, "", "Successfully Downloaded @ \n\n Internal Storage/Download/quarry/reports/$filename.pdf", "", "");
+    OpenFile.open(path);
+ //   CustomAlert().billSuccessAlert(context, "", "Successfully Downloaded @ \n\n Internal Storage/Download/quarry/reports/$filename.pdf", "", "");
   });
 
 

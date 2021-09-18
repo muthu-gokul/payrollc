@@ -51,6 +51,7 @@ dependencies:
   shimmer:
   excel:
   pdf:
+  open_file:
   http:
   geocoder:
     path: ./flutter_geocoder-master
