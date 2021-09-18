@@ -317,7 +317,7 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
 
                                int i=0,j=0;
                                setState(() {
-                               //  load=true;
+                                 load=true;
                                });
 
                                await Future.forEach(lists, (element) async{
@@ -331,16 +331,16 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
                                     j=0;
                                     await  Future.forEach(v['Images'], (ele) async {
                                       print("I $i");
-                                   //   var res= await http.get(Uri.parse(ele.toString()));
+                                      var res= await http.get(Uri.parse(ele.toString()));
                                       print("HH");
                                       j++;
                                       print("J $j");
-                                    //  v['Img'].add(res.bodyBytes);
+                                      v['Img'].add(res.bodyBytes);
                                       if(i==j){
                                         setState(() {
-                                     //     load=false;
+                                          load=false;
                                         });
-                              //          log("DATA $lists");
+                                        checkpdf2(context, DateFormat("dd/MM/yyyy").format(date!),lists);
                                        // checkpdf(context, DateFormat("dd/MM/yyyy").format(date!),lists);
                                       }
                                     });
@@ -349,7 +349,7 @@ class _ExpenseReportEmployeeListState extends State<ExpenseReportEmployeeList> {
                                 });
 
                                 //checkpdf(context, DateFormat("dd/MM/yyyy").format(date!),lists);
-                                checkpdf2(context, DateFormat("dd/MM/yyyy").format(date!),lists);
+                            //    checkpdf2(context, DateFormat("dd/MM/yyyy").format(date!),lists);
 
                                   // lists.forEach((element) {
                                   //   print("hh");

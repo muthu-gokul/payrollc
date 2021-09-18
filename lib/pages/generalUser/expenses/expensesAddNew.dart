@@ -278,7 +278,7 @@ class _GeneralUserExpensesAddNewState extends State<GeneralUserExpensesAddNew> {
                       GestureDetector(
                         onTap: () async{
 
-                          images  = await picker.pickMultiImage(imageQuality: 25,);
+                          images  = await picker.pickMultiImage(imageQuality: 20);
 
                           setState(() {});
 
